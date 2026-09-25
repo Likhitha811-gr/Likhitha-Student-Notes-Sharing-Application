@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Profile</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+
+            background-image:
+                linear-gradient(
+                    rgba(255, 248, 230, 0.82),
+                    rgba(255, 248, 230, 0.82)
+                ),
+                url("/static/image.jpeg");
+
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+
+            color: #4b3b2a;
+        }
+
+        .container {
+            width: 92%;
+            max-width: 700px;
+            margin: 50px auto;
+        }
+
+        .profile-box {
+            background: rgba(255, 250, 240, 0.94);
+
+            border-radius: 22px;
+
+            padding: 35px;
+
+            box-shadow:
+                0 8px 25px rgba(0, 0, 0, 0.15);
+
+            text-align: center;
+        }
+
+        .profile-icon {
+            font-size: 70px;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            margin-bottom: 25px;
+            color: #5d4933;
+        }
+
+        .info {
+            background: rgba(245, 225, 190, 0.65);
+
+            border-radius: 14px;
+
+            padding: 15px;
+
+            margin: 12px 0;
+
+            text-align: left;
+        }
+
+        .info strong {
+            display: block;
+
+            margin-bottom: 5px;
+
+            color: #6d563b;
+        }
+
+        .stats {
+            display: grid;
+
+            grid-template-columns: 1fr 1fr;
+
+            gap: 15px;
+
+            margin-top: 20px;
+        }
+
+        .stat {
+            background: rgba(245, 225, 190, 0.65);
+
+            padding: 20px;
+
+            border-radius: 15px;
+        }
+
+        .stat h2 {
+            margin: 0;
+
+            font-size: 28px;
+        }
+
+        .stat p {
+            margin-bottom: 0;
+        }
+
+        .btn {
+            display: inline-block;
+
+            padding: 11px 18px;
+
+            margin: 8px 4px;
+
+            border-radius: 10px;
+
+            text-decoration: none;
+
+            color: white;
+
+            background: #8b6f47;
+        }
+
+        .edit {
+            background: #6d7c59;
+        }
+
+        .back {
+            background: #7b6848;
+        }
+
+        .logout {
+            background: #9b4d4d;
+        }
+
+        @media (max-width: 600px) {
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-box {
+                padding: 25px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="profile-box">
+
+        <div class="profile-icon">
+            👤
+        </div>
+
+        <h1>
+            My Profile
+        </h1>
+
+        <!-- NAME -->
+
+        <div class="info">
+
+            <strong>
+                Name
+            </strong>
+
+            {{ user["name"] }}
+
+        </div>
+
+        <!-- EMAIL -->
+
+        <div class="info">
+
+            <strong>
+                Email
+            </strong>
+
+            {{ user["email"] }}
+
+        </div>
+
+        <!-- ROLE -->
+
+        <div class="info">
+
+            <strong>
+                Role
+            </strong>
+
+            {{ user["role"] }}
+
+        </div>
+
+        <!-- STATISTICS -->
+
+        <div class="stats">
+
+            <div class="stat">
+
+                <h2>
+                    📚 {{ total_uploads }}
+                </h2>
+
+                <p>
+                    Total Uploads
+                </p>
+
+            </div>
+
+            <div class="stat">
+
+                <h2>
+                    ❤️ {{ total_favourites }}
+                </h2>
+
+                <p>
+                    Favourite Notes
+                </p>
+
+            </div>
+
+        </div>
+
+        <!-- BUTTONS -->
+
+        <div style="margin-top: 25px;">
+
+            <a
+                class="btn edit"
+                href="{{ url_for('edit_profile') }}"
+            >
+                ✏️ Edit Profile
+            </a>
+
+            <a
+                class="btn back"
+                href="{{ url_for('dashboard') }}"
+            >
+                ⬅️ Dashboard
+            </a>
+
+            <a
+                class="btn logout"
+                href="{{ url_for('logout') }}"
+            >
+                Logout
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

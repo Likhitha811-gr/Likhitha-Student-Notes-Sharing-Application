@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Profile</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+
+            background-image:
+                linear-gradient(
+                    rgba(255,248,230,0.82),
+                    rgba(255,248,230,0.82)
+                ),
+                url("/static/backgroundpic.jpg");
+
+            background-size: cover;
+            background-position: center;
+
+            color: #4b3b2a;
+        }
+
+        .box {
+            width: 90%;
+            max-width: 500px;
+
+            margin: 60px auto;
+
+            padding: 30px;
+
+            background: rgba(255,250,240,0.95);
+
+            border-radius: 20px;
+
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        h1 {
+            text-align: center;
+            color: #5d4933;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+
+            border: 1px solid #c7b69a;
+            border-radius: 10px;
+
+            box-sizing: border-box;
+            font-size: 15px;
+        }
+
+        button,
+        a {
+            display: inline-block;
+
+            padding: 11px 18px;
+
+            margin-top: 20px;
+
+            border: none;
+            border-radius: 10px;
+
+            text-decoration: none;
+
+            color: white;
+
+            cursor: pointer;
+
+            font-size: 14px;
+        }
+
+        button {
+            background: #6d7c59;
+        }
+
+        .back {
+            background: #8b6f47;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="box">
+
+    <h1>✏️ Edit Profile</h1>
+
+    <form method="POST">
+
+        <label>Name</label>
+
+        <input
+            type="text"
+            name="name"
+            value="{{ user[1] }}"
+            required
+        >
+
+        <label>Email</label>
+
+        <input
+            type="email"
+            name="email"
+            value="{{ user[2] }}"
+            required
+        >
+
+<label>Password</label>
+<input
+type="password"
+name="password"
+value="{{ user[3] }}
+required
+>
+        <button type="submit">
+            💾 Save Changes
+        </button>
+
+        <a
+            class="back"
+            href="{{ url_for('profile') }}"
+        >
+            ⬅️ Back to Profile
+        </a>
+
+    </form>
+
+</div>
+
+</body>
+</html>

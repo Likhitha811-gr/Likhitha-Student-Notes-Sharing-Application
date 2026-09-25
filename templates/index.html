@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Student Notes Sharing Application</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            font-family: Arial, sans-serif;
+
+            background-image:
+                linear-gradient(
+                    rgba(245, 234, 215, 0.35),
+                    rgba(245, 234, 215, 0.35)
+                ),
+                url("{{ url_for('static', filename='image.jpeg') }}");
+
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .welcome-box {
+            width: 90%;
+            max-width: 650px;
+
+            padding: 40px;
+
+            background: rgba(255, 248, 238, 0.92);
+
+            border-radius: 20px;
+
+            box-shadow:
+                0 6px 20px rgba(0, 0, 0, 0.25);
+
+            text-align: center;
+        }
+
+        h1 {
+            margin: 0;
+
+            color: #5b3e2b;
+
+            font-size: 32px;
+
+            line-height: 1.3;
+        }
+
+        .subtitle {
+            margin-top: 12px;
+            margin-bottom: 30px;
+
+            color: #765f4d;
+
+            font-size: 17px;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-block;
+
+            padding: 13px 28px;
+
+            border-radius: 9px;
+
+            background: #6f4e37;
+
+            color: white;
+
+            text-decoration: none;
+
+            font-size: 16px;
+
+            font-weight: bold;
+
+            transition: 0.2s;
+        }
+
+        .btn:hover {
+            background: #563a29;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="welcome-box">
+
+        <h1>
+            Welcome to<br>
+            Student Notes Sharing Application
+        </h1>
+
+        <p class="subtitle">
+            Share • Learn • Grow
+        </p>
+
+        <div class="buttons">
+
+            <a
+                href="{{ url_for('login') }}"
+                class="btn"
+            >
+                🔐 Login
+            </a>
+
+            <a
+                href="{{ url_for('register') }}"
+                class="btn"
+            >
+                📄 Register
+            </a>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

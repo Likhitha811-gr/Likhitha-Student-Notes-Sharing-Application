@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload Notes</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+
+            background-image:
+                linear-gradient(
+                    rgba(250,245,235,0.75),
+                    rgba(250,245,235,0.75)
+                ),
+                url("{{ url_for('static', filename='backgroundpic.jpg') }}");
+
+            background-size: cover;
+            background-position: center;
+            min-height: 100vh;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .box {
+            width: 90%;
+            max-width: 500px;
+
+            background: rgba(255,248,238,0.95);
+
+            padding: 30px;
+
+            border-radius: 15px;
+
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            text-align: center;
+            color: #5b3e2b;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 6px;
+            font-weight: bold;
+            color: #5b3e2b;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 11px;
+
+            border: 1px solid #c8b69d;
+            border-radius: 7px;
+
+            font-size: 15px;
+        }
+
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 20px;
+            padding: 13px;
+
+            background: #6f4e37;
+            color: white;
+
+            border: none;
+            border-radius: 7px;
+
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #543a29;
+        }
+
+        .back {
+            display: block;
+            text-align: center;
+
+            margin-top: 18px;
+
+            color: #6f4e37;
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="box">
+
+    <h1>📤 Upload Notes</h1>
+
+    <form method="POST"
+          action="{{ url_for('upload') }}"
+          enctype="multipart/form-data">
+
+        <label>📘 Note Title</label>
+
+        <input
+            type="text"
+            name="title"
+            placeholder="Enter note title"
+            required
+        >
+
+
+        <label>📚 Subject</label>
+
+        <input
+            type="text"
+            name="subject"
+            placeholder="Enter subject"
+            required
+        >
+
+
+        <label>📝 Description</label>
+
+        <textarea
+            name="description"
+            placeholder="Enter short description about the notes"
+        ></textarea>
+
+
+        <label>📎 Select File</label>
+
+        <input
+            type="file"
+            name="file"
+            required
+        >
+
+
+        <button type="submit">
+            📤 Upload Notes
+        </button>
+
+    </form>
+
+
+    <a class="back"
+       href="{{ url_for('dashboard') }}">
+        ← Back to Dashboard
+    </a>
+
+</div>
+
+</body>
+</html>

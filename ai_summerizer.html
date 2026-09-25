@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Summarizer - Student Notes</title>
+
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: url("/static/backgroundpic.jpg") center center / cover no-repeat fixed;
+            font-family: Georgia, serif;
+            color: #333;
+        }
+
+        .container {
+            width: 85%;
+            max-width: 900px;
+            margin: auto;
+            padding: 50px 0;
+        }
+
+        .box {
+            background: rgba(255,255,255,0.70);
+            backdrop-filter: blur(6px);
+            padding: 35px;
+            border-radius: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #555;
+            margin-bottom: 30px;
+        }
+
+        textarea {
+            width: 95%;
+            height: 250px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            font-size: 16px;
+            resize: vertical;
+            font-family: Arial, sans-serif;
+        }
+
+        button {
+            margin-top: 18px;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 9px;
+            background: #ffffff;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #eeeeee;
+        }
+
+        .back {
+            text-decoration: none;
+        }
+
+        .info {
+            margin-top: 25px;
+            padding: 18px;
+            background: rgba(255,255,255,0.60);
+            border-radius: 12px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="box">
+
+        <h1>🤖 AI Summarizer</h1>
+
+        <p class="subtitle">
+            Enter your study notes and get a short summary.
+        </p>
+
+        <textarea
+            id="noteText"
+            placeholder="Paste or type your study notes here..."></textarea>
+
+        <br>
+
+        <button onclick="generateSummary()">
+            ✨ Generate Summary
+        </button>
+
+        <div class="info" id="result">
+            Your AI-generated summary will appear here.
+        </div>
+
+        <br>
+
+        <a href="/dashboard" class="back">
+            <button>⬅️ Back to Dashboard</button>
+        </a>
+
+    </div>
+
+</div>
+
+<script>
+
+function generateSummary() {
+
+    let text = document.getElementById("noteText").value.trim();
+    let result = document.getElementById("result");
+
+    if (text === "") {
+        result.innerHTML = "⚠️ Please enter your notes first.";
+        return;
+    }
+
+    result.innerHTML =
+        "⏳ AI Summarizer is ready. Actual AI generation will be connected in the next step.";
+
+}
+
+</script>
+
+</body>
+</html>

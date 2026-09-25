@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register - Student Notes Sharing</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+
+            background:
+                linear-gradient(rgba(245, 239, 227, 0.78), rgba(245, 239, 227, 0.78)),
+                url("{{ url_for('static', filename='regi.jpeg') }}");
+
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .register-box {
+            width: 430px;
+            padding: 30px;
+
+            background: rgba(255, 255, 255, 0.88);
+
+            border-radius: 20px;
+
+            box-shadow:
+                0 8px 30px rgba(0, 0, 0, 0.18);
+        }
+
+        h1 {
+            text-align: center;
+            color: #5d4037;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #777;
+            margin-bottom: 25px;
+        }
+
+        .row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .row .input-group {
+            flex: 1;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            color: #5d4037;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px;
+
+            border: 1px solid #c8b8a5;
+            border-radius: 10px;
+
+            font-size: 15px;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #795548;
+        }
+
+        .terms {
+            margin-top: 5px;
+            padding: 12px;
+
+            background: rgba(245, 239, 227, 0.8);
+
+            border-radius: 10px;
+
+            font-size: 13px;
+            color: #555;
+        }
+
+        .terms label {
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+            font-weight: normal;
+            color: #555;
+        }
+
+        .terms input {
+            margin-top: 3px;
+        }
+
+        .terms ul {
+            margin: 8px 0 0 25px;
+            padding: 0;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 20px;
+
+            padding: 13px;
+
+            border: none;
+            border-radius: 10px;
+
+            background: #795548;
+            color: white;
+
+            font-size: 16px;
+            font-weight: bold;
+
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #5d4037;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 18px;
+        }
+
+        .login-link a {
+            color: #795548;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        @media (max-width: 500px) {
+            .register-box {
+                width: 92%;
+                padding: 25px;
+            }
+
+            .row {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="register-box">
+
+    <h1>Create Account</h1>
+
+    <p class="subtitle">
+        Join Student Notes Sharing Application
+    </p>
+
+    <form method="POST" action="{{ url_for('register') }}">
+
+        <div class="row">
+
+            <div class="input-group">
+                <label>First Name</label>
+                <input
+                    type="text"
+                    name="first_name"
+                    placeholder="Enter first name"
+                    required
+                >
+            </div>
+
+            <div class="input-group">
+                <label>Last Name</label>
+                <input
+                    type="text"
+                    name="last_name"
+                    placeholder="Enter last name"
+                    required
+                >
+            </div>
+
+        </div>
+
+        <div class="input-group">
+            <label>Username</label>
+            <input
+                type="text"
+                name="username"
+                placeholder="Enter username"
+                required
+            >
+        </div>
+
+        <div class="input-group">
+            <label>Email</label>
+            <input
+                type="email"
+                name="email"
+                placeholder="Enter email address"
+                required
+            >
+        </div>
+
+        <div class="input-group">
+            <label>Password</label>
+            <input
+                type="password"
+                name="password"
+                placeholder="Create password"
+                minlength="12"
+                required
+            >
+        </div>
+
+        <div class="input-group">
+            <label>Confirm Password</label>
+            <input
+                type="password"
+                name="confirm_password"
+                placeholder="Confirm password"
+                minlength="12"
+                required
+            >
+        </div>
+
+        <div class="terms">
+
+            <label>
+                <input type="checkbox" required>
+
+                <span>
+                    I agree to the terms and conditions.
+                </span>
+            </label>
+
+            <ul>
+                <li>Use this application for educational purposes.</li>
+                <li>Upload only useful and appropriate study materials.</li>
+                <li>Do not upload copyrighted or harmful content.</li>
+            </ul>
+
+        </div>
+
+        <button type="submit">
+            Register
+        </button>
+
+    </form>
+
+    <div class="login-link">
+        Already have an account?
+        <a href="{{ url_for('login') }}">Login</a>
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AI Summarizer</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+
+            font-family: Arial, sans-serif;
+
+            background-image:
+                linear-gradient(
+                    rgba(245, 239, 227, 0.82),
+                    rgba(245, 239, 227, 0.82)
+                ),
+                url("/static/image.jpeg");
+
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+
+            min-height: 100vh;
+
+            color: #4b3b2a;
+        }
+
+        .container {
+            width: 85%;
+            max-width: 900px;
+
+            margin: 40px auto;
+
+            background: rgba(255, 255, 255, 0.92);
+
+            padding: 30px;
+
+            border-radius: 18px;
+
+            box-shadow:
+                0 5px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        h1 {
+            text-align: center;
+
+            color: #5d4037;
+
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+
+            color: #777;
+
+            margin-bottom: 25px;
+        }
+
+        textarea {
+            width: 100%;
+
+            height: 250px;
+
+            padding: 15px;
+
+            box-sizing: border-box;
+
+            border: 1px solid #c8b8a5;
+
+            border-radius: 12px;
+
+            font-size: 16px;
+
+            resize: vertical;
+
+            outline: none;
+
+            font-family: Arial, sans-serif;
+
+            background: #fff;
+        }
+
+        textarea:focus {
+            border-color: #8d6e63;
+        }
+
+        button {
+            display: block;
+
+            margin: 20px auto;
+
+            padding: 12px 30px;
+
+            border: none;
+
+            border-radius: 10px;
+
+            background: #795548;
+
+            color: white;
+
+            font-size: 16px;
+
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #5d4037;
+        }
+
+        .result {
+            margin-top: 25px;
+
+            padding: 20px;
+
+            background: #faf7f2;
+
+            border-left: 5px solid #795548;
+
+            border-radius: 10px;
+
+            white-space: pre-wrap;
+
+            line-height: 1.6;
+        }
+
+        .result h2 {
+            color: #5d4037;
+
+            margin-top: 0;
+        }
+
+        .back {
+            text-align: center;
+
+            margin-top: 20px;
+        }
+
+        .back a {
+            color: #795548;
+
+            text-decoration: none;
+
+            font-weight: bold;
+        }
+
+        .back a:hover {
+            text-decoration: underline;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>
+            🤖 AI Summarizer
+        </h1>
+
+        <p class="subtitle">
+            Paste your study notes and let AI create a simple summary.
+        </p>
+
+
+        <form method="POST" action="{{ url_for('ai_summarizer') }}">
+
+            <textarea
+                name="text"
+                placeholder="Paste your study notes here..."
+                required
+            >{{ entered_text }}</textarea>
+
+            <button type="submit">
+                Generate Summary
+            </button>
+
+        </form>
+
+
+        {% if summary %}
+
+        <div class="result">
+
+            <h2>
+                📚 Summary
+            </h2>
+
+            {{ summary }}
+
+        </div>
+
+        {% endif %}
+
+
+        <div class="back">
+
+            <a href="{{ url_for('dashboard') }}">
+                ← Back to Dashboard
+            </a>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Question Generator</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: #f5efe3;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 85%;
+            max-width: 900px;
+            margin: 40px auto;
+            background: rgba(255, 255, 255, 0.92);
+            padding: 30px;
+            border-radius: 18px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+
+        h1 {
+            text-align: center;
+            color: #5d4037;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #777;
+            margin-bottom: 25px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 250px;
+            padding: 15px;
+            box-sizing: border-box;
+            border: 1px solid #c8b8a5;
+            border-radius: 12px;
+            font-size: 16px;
+            resize: vertical;
+            outline: none;
+        }
+
+       textarea:focus {
+            border-color: #777;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.15);
+}
+
+
+        button {
+            display: block;
+            margin: 20px auto;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            background: #795548;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #5d4037;
+        }
+
+        .result {
+            margin-top: 25px;
+            padding: 20px;
+            background: #faf7f2;
+            border-left: 5px solid #795548;
+            border-radius: 10px;
+            white-space: pre-wrap;
+            line-height: 1.6;
+        }
+
+        .back {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .back a {
+            color: #795548;
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Question Generator</h1>
+
+    <p class="subtitle">
+        Enter your study material and generate useful exam questions.
+    </p>
+
+    <form method="POST" action="{{ url_for('question_generator') }}">
+
+        <textarea
+            name="text"
+            placeholder="Paste or type your study notes here..."
+            required
+        >{{ entered_text }}</textarea>
+
+        <button type="submit">
+            Generate Questions
+        </button>
+
+    </form>
+
+    {% if questions %}
+    <div class="result">
+        <h2>Generated Questions</h2>
+
+        {{ questions }}
+    </div>
+    {% endif %}
+
+    <div class="back">
+        <a href="{{ url_for('dashboard') }}">← Back to Dashboard</a>
+    </div>
+
+</div>
+
+</body>
+</html>

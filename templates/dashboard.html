@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Student Notes Dashboard</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+
+            background-image:
+                linear-gradient(
+                    rgba(250, 245, 235, 0.72),
+                    rgba(250, 245, 235, 0.72)
+                ),
+                url("{{ url_for('static', filename='image.jpeg') }}");
+
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+
+            color: #5b3e2b;
+        }
+
+        .container {
+            width: 92%;
+            max-width: 1200px;
+            margin: auto;
+            padding: 25px 0 50px;
+        }
+
+        .top {
+            background: rgba(255, 248, 238, 0.92);
+            padding: 20px 25px;
+            border-radius: 18px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+
+        .top h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        .top p {
+            margin: 5px 0 0;
+            color: #765f4d;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .buttons a {
+            text-decoration: none;
+            background: #6f4e37;
+            color: white;
+            padding: 9px 14px;
+            border-radius: 7px;
+            font-size: 14px;
+        }
+
+        .buttons a:hover {
+            background: #543a29;
+        }
+
+        .search-box {
+            margin-top: 22px;
+            background: rgba(255, 248, 238, 0.92);
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #c8b69d;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+            margin-top: 22px;
+        }
+
+        .stat {
+            background: rgba(255, 248, 238, 0.92);
+            padding: 22px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.12);
+        }
+
+        .stat h2 {
+            margin: 0;
+            font-size: 30px;
+            color: #6f4e37;
+        }
+
+        .stat p {
+            margin-bottom: 0;
+        }
+
+        .upload-section {
+            text-align: center;
+            margin: 28px 0;
+        }
+
+        .upload-btn {
+            display: inline-block;
+            text-decoration: none;
+            background: #4f8f55;
+            color: white;
+            padding: 16px 35px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+
+            box-shadow: 0 5px 15px rgba(0,0,0,0.20);
+        }
+
+        .upload-btn:hover {
+            background: #3e7444;
+        }
+
+        .section {
+            margin-top: 25px;
+        }
+
+        .section h2 {
+            text-align: center;
+            margin-bottom: 18px;
+        }
+
+        .ai-grid,
+        .notes-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+
+        .card {
+            background: rgba(255, 248, 238, 0.94);
+            padding: 22px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.12);
+        }
+
+        .card h3 {
+            margin-top: 0;
+            color: #5b3e2b;
+        }
+
+        .card p {
+            color: #765f4d;
+            line-height: 1.5;
+        }
+
+        .card a {
+            display: inline-block;
+            text-decoration: none;
+            background: #6f4e37;
+            color: white;
+            padding: 9px 13px;
+            border-radius: 7px;
+            margin-top: 8px;
+            font-size: 14px;
+        }
+
+        .note-actions {
+            display: flex;
+            gap: 7px;
+            flex-wrap: wrap;
+        }
+
+        .note-actions a,
+        .note-actions button {
+            border: none;
+            background: #6f4e37;
+            color: white;
+            padding: 8px 10px;
+            border-radius: 6px;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .delete-btn {
+            background: #a94442 !important;
+        }
+
+        .no-notes {
+            text-align: center;
+            padding: 25px;
+            background: rgba(255, 248, 238, 0.92);
+            border-radius: 15px;
+        }
+
+        @media (max-width: 800px) {
+            .ai-grid,
+            .notes-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .top {
+                text-align: center;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="top">
+
+        <div>
+            <h1>📚 Student Notes Sharing</h1>
+            <p>Welcome, {{ user_name }} 👋</p>
+        </div>
+
+        <div class="buttons">
+            <a href="{{ url_for('profile') }}">👤 Profile</a>
+            <a href="{{ url_for('change_password') }}">🔑 Password</a>
+            <a href="{{ url_for('logout') }}">🚪 Logout</a>
+        </div>
+
+    </div>
+
+
+    <div class="search-box">
+
+        <input
+            type="text"
+            id="search"
+            placeholder="🔍 Search notes by title or subject..."
+            onkeyup="searchNotes()"
+        >
+
+    </div>
+
+
+    <div class="stats">
+
+        <div class="stat">
+            <h2>{{ total_notes }}</h2>
+            <p>📚 Total Notes</p>
+        </div>
+
+        <div class="stat">
+            <h2>{{ my_uploads }}</h2>
+            <p>📤 My Uploads</p>
+        </div>
+
+    </div>
+
+
+    <div class="upload-section">
+
+        <a class="upload-btn" href="{{ url_for('upload') }}">
+            📤 Upload Notes
+        </a>
+
+    </div>
+
+
+    <div class="section">
+
+        <h2>🤖 AI Study Tools</h2>
+
+        <div class="ai-grid">
+
+            <div class="card">
+                <h3>📝 AI Summarizer</h3>
+                <p>Convert your study material into simple summaries.</p>
+                <a href="{{ url_for('ai_summarizer') }}">
+                    Open Summarizer
+                </a>
+            </div>
+
+            <div class="card">
+                <h3>❓ Question Generator</h3>
+                <p>Generate useful exam questions from your notes.</p>
+                <a href="{{ url_for('question_generator') }}">
+                    Generate Questions
+                </a>
+            </div>
+
+            <div class="card">
+                <h3>🧠 Quiz Generator</h3>
+                <p>Create multiple-choice quizzes for practice.</p>
+                <a href="{{ url_for('quiz_generator') }}">
+                    Start Quiz
+                </a>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="section">
+
+        <h2>📖 Available Notes</h2>
+
+        {% if notes %}
+
+        <div class="notes-grid" id="notesContainer">
+
+            {% for note in notes %}
+
+            <div
+                class="card note-card"
+                data-search="{{ note.title|lower }} {{ note.subject|lower }}"
+            >
+
+                <h3>📘 {{ note.title }}</h3>
+
+                <p>
+                    <strong>Subject:</strong>
+                    {{ note.subject }}
+                </p>
+
+                {% if note.description %}
+                <p>
+                    <strong>Description:</strong><br>
+                    {{ note.description }}
+                </p>
+                {% endif %}
+
+                <p>
+                    <strong>Uploaded by:</strong>
+                    {{ note.uploaded_by or "Student" }}
+                </p>
+
+                <p>
+                    <strong>Uploaded:</strong>
+                    {{ note.uploaded_date }}
+                </p>
+
+                <div class="note-actions">
+
+                    <a href="{{ url_for('view', filename=note.filename) }}">
+                        👁 View
+                    </a>
+
+                    <a href="{{ url_for('download', filename=note.filename) }}">
+                        ⬇ Download
+                    </a>
+
+                    <a href="{{ url_for('favourite', note_id=note.id) }}">
+                        {% if note.id in favourite_ids %}
+                            ⭐ Favourite
+                        {% else %}
+                            ☆ Favourite
+                        {% endif %}
+                    </a>
+
+                    {% if note.uploaded_by == user_name %}
+
+                    <a href="{{ url_for('edit_note', note_id=note.id) }}">
+                        ✏ Edit
+                    </a>
+
+                    <form
+                        method="POST"
+                        action="{{ url_for('delete_note', note_id=note.id) }}"
+                        style="display:inline;"
+                    >
+                        <button
+                            type="submit"
+                            class="delete-btn"
+                            onclick="return confirm('Delete this note?')"
+                        >
+                            🗑 Delete
+                        </button>
+                    </form>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+        {% else %}
+
+        <div class="no-notes">
+            <p>No notes uploaded yet.</p>
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+<script>
+
+function searchNotes() {
+
+    let input =
+        document.getElementById("search").value.toLowerCase();
+
+    let cards =
+        document.querySelectorAll(".note-card");
+
+    cards.forEach(function(card) {
+
+        let text =
+            card.getAttribute("data-search");
+
+        if (text.includes(input)) {
+            card.style.display = "block";
+        } else {
+            card.style.display = "none";
+        }
+
+    });
+
+}
+
+</script>
+
+</body>
+</html>

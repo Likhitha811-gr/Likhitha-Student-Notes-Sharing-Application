@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>AI Summarizer - Student Notes</title>
+
+    <style>
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: url("/static/backgroundpic.jpg")
+                        center center / cover no-repeat fixed;
+            font-family: Georgia, serif;
+            color: #333;
+        }
+
+        .container {
+            width: 85%;
+            max-width: 900px;
+            margin: auto;
+            padding: 50px 0;
+        }
+
+        .box {
+            background: rgba(255, 255, 255, 0.72);
+            backdrop-filter: blur(6px);
+            padding: 35px;
+            border-radius: 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 34px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #555;
+            margin-bottom: 30px;
+            font-size: 17px;
+        }
+
+        textarea {
+            width: 95%;
+            height: 250px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            font-size: 16px;
+            resize: vertical;
+            font-family: Arial, sans-serif;
+            outline: none;
+        }
+
+        textarea:focus {
+            border-color: #777;
+            box-shadow: 0 0 5px rgba(0,0,0,0.15);
+        }
+
+        button {
+            margin-top: 18px;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 9px;
+            background: rgba(255,255,255,0.9);
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: white;
+        }
+
+        .summary {
+            margin-top: 25px;
+            padding: 20px;
+            background: rgba(255,255,255,0.75);
+            border-radius: 12px;
+            line-height: 1.7;
+            white-space: pre-wrap;
+        }
+
+        .error {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255,220,220,0.8);
+            border-radius: 10px;
+        }
+
+        .back {
+            text-decoration: none;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="box">
+
+        <h1>🤖 AI Summarizer</h1>
+
+        <p class="subtitle">
+            Paste your study notes and let AI create a simple summary.
+        </p>
+
+        <form method="POST" action="/ai-summarizer">
+
+            <textarea
+                name="note_text"
+                placeholder="Paste your study notes here..."
+                required></textarea>
+
+            <br>
+
+            <button type="submit">
+                ✨ Generate Summary
+            </button>
+
+        </form>
+
+
+        {% if error %}
+
+        <div class="error">
+            ⚠️ {{ error }}
+        </div>
+
+        {% endif %}
+
+
+        {% if summary %}
+
+        <div class="summary">
+
+            <h2>📚 AI Summary</h2>
+
+            {{ summary }}
+
+        </div>
+
+        {% endif %}
+
+
+        <a href="/dashboard" class="back">
+
+            <button type="button">
+                ⬅️ Back to Dashboard
+            </button>
+
+        </a>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

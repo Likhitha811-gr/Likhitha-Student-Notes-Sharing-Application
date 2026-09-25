@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Login - Student Notes</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            font-family: Arial, sans-serif;
+
+            background-image:
+                linear-gradient(
+                    rgba(245, 234, 215, 0.35),
+                    rgba(245, 234, 215, 0.35)
+                ),
+                url("{{ url_for('static', filename='backgroundpic.jpg') }}");
+
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .login-box {
+            width: 90%;
+            max-width: 400px;
+
+            padding: 30px;
+
+            background: rgba(255, 248, 238, 0.92);
+
+            border-radius: 15px;
+
+            box-shadow:
+                0 6px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        h1 {
+            text-align: center;
+            color: #5b3e2b;
+
+            margin-top: 0;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #765f4d;
+
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+
+            margin-top: 15px;
+            margin-bottom: 6px;
+
+            color: #5b3e2b;
+
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+
+            padding: 12px;
+
+            border: 1px solid #c9b79c;
+
+            border-radius: 8px;
+
+            font-size: 15px;
+
+            outline: none;
+
+            background: white;
+        }
+
+        input:focus {
+            border-color: #8b6f47;
+        }
+
+        button {
+            width: 100%;
+
+            margin-top: 25px;
+
+            padding: 13px;
+
+            border: none;
+
+            border-radius: 8px;
+
+            background: #6f4e37;
+
+            color: white;
+
+            font-size: 16px;
+
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #563a29;
+        }
+
+        .register-link {
+            text-align: center;
+
+            margin-top: 20px;
+
+            color: #765f4d;
+        }
+
+        .register-link a {
+            color: #6f4e37;
+
+            font-weight: bold;
+
+            text-decoration: none;
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <div class="login-box">
+
+        <h1>🔐 Login</h1>
+
+        <p class="subtitle">
+            Student Notes Sharing Application
+        </p>
+
+        <form method="POST" action="{{ url_for('login') }}">
+
+            <label for="email">
+                📧 Email
+            </label>
+
+            <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="Enter your email"
+                required
+            >
+
+
+            <label for="password">
+                🔑 Password
+            </label>
+
+            <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="Enter your password"
+                required
+            >
+
+
+            <button type="submit">
+                Login
+            </button>
+
+        </form>
+
+
+        <div class="register-link">
+
+            Don't have an account?
+
+            <a href="{{ url_for('register') }}">
+                Register
+            </a>
+
+        </div>
+
+    </div>
+
+</body>
+</html>
