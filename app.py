@@ -18,16 +18,25 @@ app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
-
-
 def get_db_connection():
-    return mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="",
-        database="student_notes_db"
-    )
+    db_config = {
+        "host": os.environ["DB_HOST"],
+        "port": int(os.environ.get("DB_PORT", "4000")),
+        "user": os.environ["DB_USER"],
+        "password": os.environ["DB_PASSWORD"],
+        "database": os.environ.get("DB_NAME", "student_notes_db")
+    }
 
+    ca_path = os.environ.get("DB_SSL_CA")
+
+    if ca_path:
+        db_config.update({
+            "ssl_ca": ca_path,
+            "ssl_verify_cert": True,
+            "ssl_verify_identity": True
+        })
+
+    return mysql.connector.connect(**db_config)
 
 def setup_database():
     conn = get_db_connection()
