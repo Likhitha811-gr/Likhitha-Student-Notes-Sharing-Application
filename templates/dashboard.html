@@ -1,233 +1,587 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Student Notes Dashboard</title>
+    <title>Dashboard | Student Notes Sharing Application</title>
 
     <style>
         * {
             box-sizing: border-box;
         }
 
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-
-            background-image:
-                linear-gradient(
-                    rgba(250, 245, 235, 0.72),
-                    rgba(250, 245, 235, 0.72)
-                ),
-                url("{{ url_for('static', filename='image.jpeg') }}");
-
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            background-repeat: no-repeat;
-
-            color: #5b3e2b;
+        :root {
+            --cream: #f8f3e9;
+            --ivory: #fffdf8;
+            --beige: #eee2cf;
+            --brown: #654832;
+            --dark: #3e3026;
+            --muted: #827363;
+            --border: #e5d8c6;
+            --accent: #765239;
+            --accent-dark: #563b29;
+            --soft-green: #e6eee1;
         }
 
-        .container {
-            width: 92%;
-            max-width: 1200px;
-            margin: auto;
-            padding: 25px 0 50px;
+        
+body {
+    margin: 0;
+    font-family: "Segoe UI", Arial, sans-serif;
+    background-color: var(--cream);
+    background-image:
+        linear-gradient(
+            rgba(248, 243, 233, 0.72),
+            rgba(248, 243, 233, 0.72)
+        ),
+        url("/static/image.jpeg");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    color: var(--dark);
+}
+
+        a {
+            text-decoration: none;
         }
 
-        .top {
-            background: rgba(255, 248, 238, 0.92);
-            padding: 20px 25px;
-            border-radius: 18px;
+        button, input {
+            font: inherit;
+        }
 
+        .topbar {
+            background: var(--ivory);
+            border-bottom: 1px solid var(--border);
+            padding: 17px 5%;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 20px;
             flex-wrap: wrap;
-            gap: 15px;
-
-            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
         }
 
-        .top h1 {
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-icon {
+            width: 45px;
+            height: 45px;
+            display: grid;
+            place-items: center;
+            background: var(--beige);
+            border-radius: 13px;
+            font-size: 23px;
+        }
+
+        .brand h2 {
+            font-size: 18px;
             margin: 0;
-            font-size: 28px;
+            color: var(--brown);
         }
 
-        .top p {
-            margin: 5px 0 0;
-            color: #765f4d;
+        .brand p {
+            margin: 4px 0 0;
+            font-size: 12px;
+            color: var(--muted);
         }
 
-        .buttons {
+        .top-links {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .top-links a {
+            color: var(--brown);
+            padding: 10px 13px;
+            border-radius: 9px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .top-links a:hover {
+            background: var(--cream);
+        }
+
+        .top-links .logout {
+            border: 1px solid var(--border);
+        }
+
+        .layout {
+            max-width: 1200px;
+            width: 90%;
+            margin: 32px auto 55px;
+        }
+
+        .welcome {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 25px;
+            flex-wrap: wrap;
+            margin-bottom: 27px;
+        }
+
+        .eyebrow {
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 9px;
+        }
+
+        .welcome h1 {
+            font-size: clamp(27px, 4vw, 36px);
+            margin: 0;
+            color: var(--dark);
+            letter-spacing: -0.7px;
+        }
+
+        .welcome p {
+            color: var(--muted);
+            margin: 10px 0 0;
+            line-height: 1.6;
+        }
+
+        .upload-main {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: var(--accent);
+            color: white;
+            border-radius: 13px;
+            padding: 16px 23px;
+            font-weight: 700;
+            box-shadow: 0 5px 13px rgba(101, 72, 50, 0.17);
+            transition: 0.2s;
+        }
+
+        .upload-main:hover {
+            background: var(--accent-dark);
+            transform: translateY(-2px);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 18px;
+            margin: 27px 0 35px;
+        }
+
+        .stat-card {
+            background: var(--ivory);
+            border: 1px solid var(--border);
+            padding: 23px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .stat-icon {
+            width: 49px;
+            height: 49px;
+            display: grid;
+            place-items: center;
+            border-radius: 13px;
+            background: var(--beige);
+            font-size: 23px;
+            flex-shrink: 0;
+        }
+
+        .stat-card:nth-child(2) .stat-icon {
+            background: var(--soft-green);
+        }
+
+        .stat-card h3 {
+            font-size: 25px;
+            margin: 0 0 5px;
+            color: var(--brown);
+        }
+
+        .stat-card p {
+            font-size: 13px;
+            margin: 0;
+            color: var(--muted);
+        }
+
+        .section-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: end;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 19px;
+        }
+
+        .section-heading h2 {
+            margin: 0;
+            font-size: 23px;
+            color: var(--dark);
+        }
+
+        .section-heading p {
+            margin: 7px 0 0;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .search-box {
+            width: min(100%, 340px);
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 13px 15px 13px 42px;
+            border: 1px solid var(--border);
+            border-radius: 11px;
+            background: var(--ivory);
+            outline: none;
+            color: var(--dark);
+        }
+
+        .search-box input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(118, 82, 57, 0.09);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 12px;
+            color: var(--muted);
+        }
+
+        .notes-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 19px;
+        }
+
+        .note-card {
+            background: var(--ivory);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 22px;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 3px 12px rgba(74, 54, 37, 0.035);
+            transition: 0.2s;
+        }
+
+        .note-card:hover {
+            border-color: #cdb79b;
+            box-shadow: 0 8px 22px rgba(74, 54, 37, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .note-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .pdf-icon {
+            width: 47px;
+            height: 47px;
+            display: grid;
+            place-items: center;
+            border-radius: 13px;
+            background: #f3e5d6;
+            font-size: 22px;
+        }
+
+        .subject-tag {
+            display: inline-block;
+            background: var(--cream);
+            border: 1px solid var(--border);
+            color: var(--brown);
+            border-radius: 20px;
+            padding: 6px 10px;
+            font-size: 11px;
+            font-weight: 700;
+            max-width: 150px;
+            overflow-wrap: anywhere;
+        }
+
+        .note-card h3 {
+            font-size: 18px;
+            line-height: 1.45;
+            margin: 0 0 9px;
+            overflow-wrap: anywhere;
+        }
+
+        .description {
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.65;
+            margin: 0 0 18px;
+            overflow-wrap: anywhere;
+            flex-grow: 1;
+        }
+
+        .note-meta {
+            border-top: 1px solid #eee5d8;
+            padding-top: 14px;
+            margin-bottom: 16px;
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.8;
+        }
+
+        .note-actions {
             display: flex;
             gap: 8px;
             flex-wrap: wrap;
         }
 
-        .buttons a {
-            text-decoration: none;
-            background: #6f4e37;
-            color: white;
-            padding: 9px 14px;
-            border-radius: 7px;
-            font-size: 14px;
-        }
-
-        .buttons a:hover {
-            background: #543a29;
-        }
-
-        .search-box {
-            margin-top: 22px;
-            background: rgba(255, 248, 238, 0.92);
-            padding: 20px;
-            border-radius: 15px;
-        }
-
-        .search-box input {
-            width: 100%;
-            padding: 13px;
-            border: 1px solid #c8b69d;
-            border-radius: 8px;
-            font-size: 15px;
-        }
-
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 18px;
-            margin-top: 22px;
-        }
-
-        .stat {
-            background: rgba(255, 248, 238, 0.92);
-            padding: 22px;
-            border-radius: 15px;
-            text-align: center;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.12);
-        }
-
-        .stat h2 {
-            margin: 0;
-            font-size: 30px;
-            color: #6f4e37;
-        }
-
-        .stat p {
-            margin-bottom: 0;
-        }
-
-        .upload-section {
-            text-align: center;
-            margin: 28px 0;
-        }
-
-        .upload-btn {
-            display: inline-block;
-            text-decoration: none;
-            background: #4f8f55;
-            color: white;
-            padding: 16px 35px;
-            border-radius: 12px;
-            font-size: 18px;
-            font-weight: bold;
-
-            box-shadow: 0 5px 15px rgba(0,0,0,0.20);
-        }
-
-        .upload-btn:hover {
-            background: #3e7444;
-        }
-
-        .section {
-            margin-top: 25px;
-        }
-
-        .section h2 {
-            text-align: center;
-            margin-bottom: 18px;
-        }
-
-        .ai-grid,
-        .notes-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 18px;
-        }
-
-        .card {
-            background: rgba(255, 248, 238, 0.94);
-            padding: 22px;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.12);
-        }
-
-        .card h3 {
-            margin-top: 0;
-            color: #5b3e2b;
-        }
-
-        .card p {
-            color: #765f4d;
-            line-height: 1.5;
-        }
-
-        .card a {
-            display: inline-block;
-            text-decoration: none;
-            background: #6f4e37;
-            color: white;
-            padding: 9px 13px;
-            border-radius: 7px;
-            margin-top: 8px;
-            font-size: 14px;
-        }
-
-        .note-actions {
-            display: flex;
-            gap: 7px;
-            flex-wrap: wrap;
-        }
-
-        .note-actions a,
-        .note-actions button {
-            border: none;
-            background: #6f4e37;
-            color: white;
-            padding: 8px 10px;
-            border-radius: 6px;
-            text-decoration: none;
+        .action {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 12px;
+            border-radius: 9px;
+            font-size: 12px;
+            font-weight: 700;
+            border: 1px solid var(--border);
             cursor: pointer;
-            font-size: 13px;
+            transition: 0.2s;
         }
 
-        .delete-btn {
-            background: #a94442 !important;
+        .open-action {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
         }
 
-        .no-notes {
-            text-align: center;
+        .open-action:hover {
+            background: var(--accent-dark);
+        }
+
+        .download-action {
+            color: var(--brown);
+            background: white;
+        }
+
+        .download-action:hover {
+            background: var(--cream);
+        }
+
+        .share-action {
+            color: #466244;
+            background: #f0f5eb;
+            border-color: #dce8d4;
+        }
+
+        .share-action:hover {
+            background: #e2eddc;
+        }
+
+        .delete-form {
+            margin: 0;
+        }
+
+        .delete-action {
+            background: #fff6f2;
+            border-color: #efd5c9;
+            color: #984c38;
+        }
+
+        .delete-action:hover {
+            background: #fce8e0;
+        }
+
+
+
+        /* AI Study Tools */
+        .ai-tools-section {
+            margin: 0 0 35px;
             padding: 25px;
-            background: rgba(255, 248, 238, 0.92);
-            border-radius: 15px;
+            background: rgba(255, 253, 248, 0.94);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            box-shadow: 0 4px 16px rgba(74, 54, 37, 0.04);
         }
 
-        @media (max-width: 800px) {
-            .ai-grid,
+        .ai-tools-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 18px;
+            margin-top: 20px;
+        }
+
+        .ai-tool-card {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 22px;
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            background: #fffaf1;
+            transition: 0.2s;
+            min-width: 0;
+        }
+
+        .ai-tool-card:hover {
+            transform: translateY(-3px);
+            border-color: #cdb79b;
+            box-shadow: 0 8px 22px rgba(74, 54, 37, 0.08);
+        }
+
+        .ai-tool-icon {
+            width: 48px;
+            height: 48px;
+            display: grid;
+            place-items: center;
+            border-radius: 13px;
+            background: #f3e2cf;
+            font-size: 23px;
+            margin-bottom: 15px;
+        }
+
+        .ai-tool-card:nth-child(2) .ai-tool-icon { background: #e6eee1; }
+        .ai-tool-card:nth-child(3) .ai-tool-icon { background: #f8e9c9; }
+
+        .ai-tool-card h3 {
+            margin: 0 0 8px;
+            color: var(--brown);
+            font-size: 17px;
+        }
+
+        .ai-tool-card p {
+            margin: 0 0 18px;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.6;
+            flex-grow: 1;
+        }
+
+        .ai-tool-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 11px 14px;
+            border-radius: 9px;
+            background: var(--accent);
+            color: white;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .ai-tool-link:hover { background: var(--accent-dark); }
+
+        .empty-state {
+            background: var(--ivory);
+            border: 1px dashed #d5c3ad;
+            border-radius: 16px;
+            padding: 45px 20px;
+            text-align: center;
+            grid-column: 1 / -1;
+        }
+
+        .empty-state .empty-icon {
+            font-size: 39px;
+            margin-bottom: 12px;
+        }
+
+        .empty-state h3 {
+            margin: 0 0 8px;
+        }
+
+        .empty-state p {
+            color: var(--muted);
+            margin: 0 0 20px;
+        }
+
+        .no-results {
+            display: none;
+            padding: 22px;
+            text-align: center;
+            color: var(--muted);
+            background: var(--ivory);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin-top: 15px;
+        }
+
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 22px 15px;
+            text-align: center;
+            color: var(--muted);
+            font-size: 12px;
+            background: #f4ecdf;
+        }
+
+        @media (max-width: 900px) {
             .notes-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .ai-tools-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .stats {
+                gap: 12px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .topbar {
+                padding: 15px 5%;
+            }
+
+            .top-links {
+                width: 100%;
+            }
+
+            .layout {
+                width: 92%;
+                margin-top: 25px;
+            }
+
+            .welcome {
+                align-items: stretch;
+            }
+
+            .upload-main {
+                width: 100%;
             }
 
             .stats {
                 grid-template-columns: 1fr;
             }
 
-            .top {
-                text-align: center;
-                justify-content: center;
+            .stat-card {
+                padding: 17px;
+            }
+
+            .notes-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .ai-tools-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .ai-tools-section {
+                padding: 18px;
+            }
+
+            .search-box {
+                width: 100%;
             }
         }
     </style>
@@ -235,221 +589,224 @@
 
 <body>
 
-<div class="container">
-
-    <div class="top">
-
+<header class="topbar">
+    <div class="brand">
+        <div class="brand-icon">📚</div>
         <div>
-            <h1>📚 Student Notes Sharing</h1>
-            <p>Welcome, {{ user_name }} 👋</p>
+            <h2>Student Notes</h2>
+            <p>Sharing Application</p>
         </div>
-
-        <div class="buttons">
-            <a href="{{ url_for('profile') }}">👤 Profile</a>
-            <a href="{{ url_for('change_password') }}">🔑 Password</a>
-            <a href="{{ url_for('logout') }}">🚪 Logout</a>
-        </div>
-
     </div>
 
+    <nav class="top-links" aria-label="Main navigation">
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('profile') }}">My Profile</a>
+        <a href="{{ url_for('logout') }}" class="logout">Logout ↗</a>
+    </nav>
+</header>
 
-    <div class="search-box">
+<main class="layout">
 
-        <input
-            type="text"
-            id="search"
-            placeholder="🔍 Search notes by title or subject..."
-            onkeyup="searchNotes()"
-        >
-
-    </div>
-
-
-    <div class="stats">
-
-        <div class="stat">
-            <h2>{{ total_notes }}</h2>
-            <p>📚 Total Notes</p>
+    <section class="welcome">
+        <div>
+            <div class="eyebrow">STUDENT LEARNING SPACE</div>
+            <h1>Welcome, {{ user_name }}!</h1>
+            <p>Keep your study materials organized and discover notes shared by students.</p>
         </div>
 
-        <div class="stat">
-            <h2>{{ my_uploads }}</h2>
-            <p>📤 My Uploads</p>
-        </div>
-
-    </div>
-
-
-    <div class="upload-section">
-
-        <a class="upload-btn" href="{{ url_for('upload') }}">
-            📤 Upload Notes
+        <a href="{{ url_for('upload') }}" class="upload-main">
+            <span>＋</span> Upload Notes
         </a>
+    </section>
 
-    </div>
-
-
-    <div class="section">
-
-        <h2>🤖 AI Study Tools</h2>
-
-        <div class="ai-grid">
-
-            <div class="card">
-                <h3>📝 AI Summarizer</h3>
-                <p>Convert your study material into simple summaries.</p>
-                <a href="{{ url_for('ai_summarizer') }}">
-                    Open Summarizer
-                </a>
+    <section class="stats" aria-label="Notes overview">
+        <div class="stat-card">
+            <div class="stat-icon">📚</div>
+            <div>
+                <h3>{{ total_notes }}</h3>
+                <p>Total Notes</p>
             </div>
-
-            <div class="card">
-                <h3>❓ Question Generator</h3>
-                <p>Generate useful exam questions from your notes.</p>
-                <a href="{{ url_for('question_generator') }}">
-                    Generate Questions
-                </a>
-            </div>
-
-            <div class="card">
-                <h3>🧠 Quiz Generator</h3>
-                <p>Create multiple-choice quizzes for practice.</p>
-                <a href="{{ url_for('quiz_generator') }}">
-                    Start Quiz
-                </a>
-            </div>
-
         </div>
 
-    </div>
+        <div class="stat-card">
+            <div class="stat-icon">📤</div>
+            <div>
+                <h3>{{ my_uploads }}</h3>
+                <p>My Uploads</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">⭐</div>
+            <div>
+                <h3>{{ favourite_ids|length }}</h3>
+                <p>My Favourites</p>
+            </div>
+        </div>
+    </section>
 
 
-    <div class="section">
 
-        <h2>📖 Available Notes</h2>
+    <section class="ai-tools-section" aria-label="AI Study Tools">
+        <div class="section-heading">
+            <div>
+                <h2>✨ AI Study Tools</h2>
+                <p>Study smarter with tools designed to help with revision and practice.</p>
+            </div>
+        </div>
 
-        {% if notes %}
+        <div class="ai-tools-grid">
+            <article class="ai-tool-card">
+                <div class="ai-tool-icon">📝</div>
+                <h3>AI Notes Summarizer</h3>
+                <p>Turn lengthy study material into a shorter, easier-to-revise summary.</p>
+                <a class="ai-tool-link" href="/ai-summarizer">Summarize Notes →</a>
+            </article>
 
-        <div class="notes-grid" id="notesContainer">
+            <article class="ai-tool-card">
+                <div class="ai-tool-icon">❓</div>
+                <h3>AI Question Generator</h3>
+                <p>Create practice questions from your study topics to prepare for exams.</p>
+                <a class="ai-tool-link" href="/question-generator">Generate Questions →</a>
+            </article>
+
+            <article class="ai-tool-card">
+                <div class="ai-tool-icon">🧠</div>
+                <h3>AI Quiz Generator</h3>
+                <p>Practise what you have learned with a quiz based on your study material.</p>
+                <a class="ai-tool-link" href="/quiz-generator">Start a Quiz →</a>
+            </article>
+        </div>
+    </section>
+
+    <section>
+        <div class="section-heading">
+            <div>
+                <h2>Study Notes Library</h2>
+                <p>Browse, open, download, or share study materials.</p>
+            </div>
+
+            <label class="search-box">
+                <span class="search-icon">⌕</span>
+                <input
+                    type="search"
+                    id="noteSearch"
+                    placeholder="Search title, subject or student..."
+                    aria-label="Search notes"
+                >
+            </label>
+        </div>
+
+        <div class="notes-grid" id="notesGrid">
 
             {% for note in notes %}
+            <article class="note-card"
+                data-search="{{ (note.title ~ ' ' ~ note.subject ~ ' ' ~ (note.description or '') ~ ' ' ~ (note.uploaded_by or ''))|lower }}">
 
-            <div
-                class="card note-card"
-                data-search="{{ note.title|lower }} {{ note.subject|lower }}"
-            >
+                <div class="note-top">
+                    <div class="pdf-icon">📄</div>
+                    <span class="subject-tag">{{ note.subject }}</span>
+                </div>
 
-                <h3>📘 {{ note.title }}</h3>
+                <h3>{{ note.title }}</h3>
 
-                <p>
-                    <strong>Subject:</strong>
-                    {{ note.subject }}
+                <p class="description">
+                    {% if note.description %}
+                        {{ note.description }}
+                    {% else %}
+                        Study material shared for learning and revision.
+                    {% endif %}
                 </p>
 
-                {% if note.description %}
-                <p>
-                    <strong>Description:</strong><br>
-                    {{ note.description }}
-                </p>
-                {% endif %}
-
-                <p>
-                    <strong>Uploaded by:</strong>
-                    {{ note.uploaded_by or "Student" }}
-                </p>
-
-                <p>
-                    <strong>Uploaded:</strong>
-                    {{ note.uploaded_date }}
-                </p>
+                <div class="note-meta">
+                    <div>👤 Uploaded by: {{ note.uploaded_by or 'Student' }}</div>
+                    <div>📅
+                        {% if note.uploaded_date %}
+                            {{ note.uploaded_date.strftime('%d %b %Y') if note.uploaded_date.strftime is defined else note.uploaded_date }}
+                        {% else %}
+                            Date unavailable
+                        {% endif %}
+                    </div>
+                </div>
 
                 <div class="note-actions">
-
-                    <a href="{{ url_for('view', filename=note.filename) }}">
-                        👁 View
+                    <a class="action open-action"
+                       href="{{ url_for('view', filename=note.filename) }}"
+                       target="_blank" rel="noopener">
+                        Open PDF ↗
                     </a>
 
-                    <a href="{{ url_for('download', filename=note.filename) }}">
-                        ⬇ Download
+                    <a class="action download-action"
+                       href="{{ url_for('download', filename=note.filename) }}">
+                        Download ↓
                     </a>
 
-                    <a href="{{ url_for('favourite', note_id=note.id) }}">
-                        {% if note.id in favourite_ids %}
-                            ⭐ Favourite
-                        {% else %}
-                            ☆ Favourite
-                        {% endif %}
+                    <a class="action share-action"
+                       target="_blank" rel="noopener"
+                       href="https://wa.me/?text={{ ('Study Notes: ' ~ note.title ~ ' - ' ~ request.url_root.rstrip('/') ~ url_for('view', filename=note.filename))|urlencode }}">
+                        WhatsApp
                     </a>
 
                     {% if note.uploaded_by == user_name %}
-
-                    <a href="{{ url_for('edit_note', note_id=note.id) }}">
-                        ✏ Edit
-                    </a>
-
-                    <form
-                        method="POST"
-                        action="{{ url_for('delete_note', note_id=note.id) }}"
-                        style="display:inline;"
-                    >
-                        <button
-                            type="submit"
-                            class="delete-btn"
-                            onclick="return confirm('Delete this note?')"
-                        >
-                            🗑 Delete
+                    <form class="delete-form"
+                          method="POST"
+                          action="{{ url_for('delete_note', note_id=note.id) }}"
+                          onsubmit="return confirm('Are you sure you want to delete this note and its PDF? This cannot be undone.');">
+                        <button type="submit" class="action delete-action">
+                            Delete
                         </button>
                     </form>
-
                     {% endif %}
-
                 </div>
-
+            </article>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">📚</div>
+                <h3>No notes uploaded yet</h3>
+                <p>Start the library by sharing your first study material.</p>
+                <a href="{{ url_for('upload') }}" class="upload-main">
+                    ＋ Upload Your First Note
+                </a>
             </div>
-
             {% endfor %}
 
         </div>
 
-        {% else %}
-
-        <div class="no-notes">
-            <p>No notes uploaded yet.</p>
+        <div class="no-results" id="noResults">
+            No notes match your search. Try another title or subject.
         </div>
+    </section>
 
-        {% endif %}
+</main>
 
-    </div>
-
-</div>
-
+<footer>
+    Student Notes Sharing Application · Learn together, grow together.
+</footer>
 
 <script>
+    const searchInput = document.getElementById("noteSearch");
+    const noteCards = document.querySelectorAll(".note-card");
+    const noResults = document.getElementById("noResults");
 
-function searchNotes() {
+    searchInput.addEventListener("input", function () {
+        const query = this.value.trim().toLowerCase();
+        let visibleCount = 0;
 
-    let input =
-        document.getElementById("search").value.toLowerCase();
+        noteCards.forEach(function (card) {
+            const text = card.dataset.search || "";
+            const matches = text.includes(query);
 
-    let cards =
-        document.querySelectorAll(".note-card");
+            card.style.display = matches ? "flex" : "none";
 
-    cards.forEach(function(card) {
+            if (matches) {
+                visibleCount++;
+            }
+        });
 
-        let text =
-            card.getAttribute("data-search");
-
-        if (text.includes(input)) {
-            card.style.display = "block";
-        } else {
-            card.style.display = "none";
-        }
-
+        noResults.style.display =
+            noteCards.length > 0 && visibleCount === 0 ? "block" : "none";
     });
-
-}
-
 </script>
 
 </body>
-</html>
+

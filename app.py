@@ -1,9 +1,14 @@
-from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory, abort
+from flask import (
+    Flask, render_template, request, redirect, url_for,
+    session, send_from_directory, abort
+)
 import mysql.connector
 import os
 import json
 import secrets
+import random
 from werkzeug.utils import secure_filename
+
 
 app = Flask(
     __name__,
@@ -11,34 +16,66 @@ app = Flask(
     template_folder="templates"
 )
 
-app.secret_key = "change-this-secret-key"
+app.secret_key = os.environ.get(
+    "SECRET_KEY",
+    "local-development-secret-key"
+)
 
-UPLOAD_FOLDER = "uploads"
+UPLOAD_FOLDER = os.path.join(app.root_path, "uploads")
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+
+# -----------------------------------
+# DATABASE CONNECTION
+# -----------------------------------
+
 def get_db_connection():
-    db_config = {
-        "host": os.environ["DB_HOST"],
-        "port": int(os.environ.get("DB_PORT", "4000")),
-        "user": os.environ["DB_USER"],
-        "password": os.environ["DB_PASSWORD"],
-        "database": os.environ.get("DB_NAME", "student_notes_db")
-    }
 
-    ca_path = os.environ.get("DB_SSL_CA")
+    # Render / TiDB Cloud
+    if os.environ.get("DB_HOST"):
 
-    if ca_path:
-        db_config.update({
-            "ssl_ca": ca_path,
-            "ssl_verify_cert": True,
-            "ssl_verify_identity": True
-        })
+        db_config = {
+            "host": os.environ["DB_HOST"],
+            "port": int(os.environ.get("DB_PORT", "4000")),
+            "user": os.environ["DB_USER"],
+            "password": os.environ["DB_PASSWORD"],
+            "database": os.environ.get(
+                "DB_NAME",
+                "student_notes_db"
+            )
+        }
+
+        ca_path = os.environ.get("DB_SSL_CA")
+
+        if ca_path:
+            db_config.update({
+                "ssl_ca": ca_path,
+                "ssl_verify_cert": True,
+                "ssl_verify_identity": True
+            })
+
+    # Localhost / XAMPP
+    else:
+
+        db_config = {
+            "host": "localhost",
+            "port": 3306,
+            "user": "root",
+            "password": "",
+            "database": "student_notes_db"
+        }
 
     return mysql.connector.connect(**db_config)
 
+
+# -----------------------------------
+# DATABASE TABLE SETUP
+# -----------------------------------
+
 def setup_database():
+
     conn = get_db_connection()
     cursor = conn.cursor()
 
@@ -53,8 +90,6 @@ def setup_database():
             uploaded_date DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     """)
-
-    conn.commit()
 
     cursor.execute("SHOW COLUMNS FROM uploaded_notes")
     columns = [row[0] for row in cursor.fetchall()]
@@ -104,22 +139,44 @@ def setup_database():
 setup_database()
 
 
+# -----------------------------------
+# HOME
+# -----------------------------------
+
 @app.route("/")
 def home():
     return render_template("index.html")
 
+
+# -----------------------------------
+# REGISTER
+# -----------------------------------
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
 
     if request.method == "POST":
 
-        first_name = request.form.get("first_name", "").strip()
-        last_name = request.form.get("last_name", "").strip()
-        username = request.form.get("username", "").strip()
-        email = request.form.get("email", "").strip()
+        first_name = request.form.get(
+            "first_name", ""
+        ).strip()
+
+        last_name = request.form.get(
+            "last_name", ""
+        ).strip()
+
+        username = request.form.get(
+            "username", ""
+        ).strip()
+
+        email = request.form.get(
+            "email", ""
+        ).strip()
+
         password = request.form.get("password", "")
-        confirm_password = request.form.get("confirm_password", "")
+        confirm_password = request.form.get(
+            "confirm_password", ""
+        )
 
         if password != confirm_password:
             return "Passwords do not match."
@@ -139,6 +196,7 @@ def register():
         cursor = None
 
         try:
+
             conn = get_db_connection()
             cursor = conn.cursor()
 
@@ -171,13 +229,19 @@ def register():
             return "Database error: " + str(e)
 
         finally:
+
             if cursor:
                 cursor.close()
+
             if conn:
                 conn.close()
 
     return render_template("register.html")
 
+
+# -----------------------------------
+# LOGIN
+# -----------------------------------
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -194,6 +258,7 @@ def login():
         cursor = None
 
         try:
+
             conn = get_db_connection()
             cursor = conn.cursor(dictionary=True)
 
@@ -220,6 +285,7 @@ def login():
             return "Database error: " + str(e)
 
         finally:
+
             if cursor:
                 cursor.close()
 
@@ -228,6 +294,10 @@ def login():
 
     return render_template("login.html")
 
+
+# -----------------------------------
+# DASHBOARD
+# -----------------------------------
 
 @app.route("/dashboard")
 def dashboard():
@@ -261,8 +331,6 @@ def dashboard():
 
     my_uploads = cursor.fetchone()["total"]
 
-    favourite_ids = set()
-
     cursor.execute("""
         SELECT note_id
         FROM favourites
@@ -271,8 +339,9 @@ def dashboard():
 
     favourite_rows = cursor.fetchall()
 
-    for row in favourite_rows:
-        favourite_ids.add(row["note_id"])
+    favourite_ids = {
+        row["note_id"] for row in favourite_rows
+    }
 
     cursor.close()
     conn.close()
@@ -287,6 +356,10 @@ def dashboard():
     )
 
 
+# -----------------------------------
+# UPLOAD NOTES
+# -----------------------------------
+
 @app.route("/upload", methods=["GET", "POST"])
 def upload():
 
@@ -297,7 +370,9 @@ def upload():
 
         title = request.form.get("title", "").strip()
         subject = request.form.get("subject", "").strip()
-        description = request.form.get("description", "").strip()
+        description = request.form.get(
+            "description", ""
+        ).strip()
 
         file = request.files.get("file")
 
@@ -308,6 +383,9 @@ def upload():
             return "Please select a file."
 
         filename = secure_filename(file.filename)
+
+        if not filename:
+            return "Invalid file name."
 
         file.save(
             os.path.join(
@@ -348,6 +426,10 @@ def upload():
     return render_template("upload.html")
 
 
+# -----------------------------------
+# VIEW NOTES
+# -----------------------------------
+
 @app.route("/view/<filename>")
 def view(filename):
 
@@ -359,6 +441,10 @@ def view(filename):
         filename
     )
 
+
+# -----------------------------------
+# DOWNLOAD NOTES
+# -----------------------------------
 
 @app.route("/download/<filename>")
 def download(filename):
@@ -372,6 +458,10 @@ def download(filename):
         as_attachment=True
     )
 
+
+# -----------------------------------
+# FAVOURITES
+# -----------------------------------
 
 @app.route("/favourite/<int:note_id>")
 def favourite(note_id):
@@ -423,6 +513,10 @@ def favourite(note_id):
     return redirect(url_for("dashboard"))
 
 
+# -----------------------------------
+# PROFILE
+# -----------------------------------
+
 @app.route("/profile")
 def profile():
 
@@ -467,6 +561,10 @@ def profile():
     )
 
 
+# -----------------------------------
+# EDIT PROFILE
+# -----------------------------------
+
 @app.route("/edit-profile", methods=["GET", "POST"])
 def edit_profile():
 
@@ -496,7 +594,6 @@ def edit_profile():
         ))
 
         conn.commit()
-
         cursor.close()
         conn.close()
 
@@ -525,6 +622,10 @@ def edit_profile():
     )
 
 
+# -----------------------------------
+# CHANGE PASSWORD
+# -----------------------------------
+
 @app.route("/change-password", methods=["GET", "POST"])
 def change_password():
 
@@ -534,18 +635,15 @@ def change_password():
     if request.method == "POST":
 
         current_password = request.form.get(
-            "current_password",
-            ""
+            "current_password", ""
         )
 
         new_password = request.form.get(
-            "new_password",
-            ""
+            "new_password", ""
         )
 
         confirm_password = request.form.get(
-            "confirm_password",
-            ""
+            "confirm_password", ""
         )
 
         if new_password != confirm_password:
@@ -594,7 +692,6 @@ def change_password():
         ))
 
         conn.commit()
-
         cursor.close()
         conn.close()
 
@@ -602,6 +699,10 @@ def change_password():
 
     return render_template("change_password.html")
 
+
+# -----------------------------------
+# EDIT NOTE
+# -----------------------------------
 
 @app.route("/edit-note/<int:note_id>", methods=["GET", "POST"])
 def edit_note(note_id):
@@ -633,19 +734,10 @@ def edit_note(note_id):
 
     if request.method == "POST":
 
-        title = request.form.get(
-            "title",
-            ""
-        ).strip()
-
-        subject = request.form.get(
-            "subject",
-            ""
-        ).strip()
-
+        title = request.form.get("title", "").strip()
+        subject = request.form.get("subject", "").strip()
         description = request.form.get(
-            "description",
-            ""
+            "description", ""
         ).strip()
 
         if not title or not subject:
@@ -671,7 +763,6 @@ def edit_note(note_id):
         ))
 
         conn.commit()
-
         cursor.close()
         conn.close()
 
@@ -685,6 +776,10 @@ def edit_note(note_id):
         note=note
     )
 
+
+# -----------------------------------
+# DELETE NOTE
+# -----------------------------------
 
 @app.route("/delete-note/<int:note_id>", methods=["POST"])
 def delete_note(note_id):
@@ -744,97 +839,176 @@ def delete_note(note_id):
     return redirect(url_for("dashboard"))
 
 
+# -----------------------------------
+# LOCAL SUMMARIZER
+# -----------------------------------
+
 def local_summarize(text):
+
     import re
     from collections import Counter
 
-    sentences = re.split(r'(?<=[.!?])\s+', text.strip())
+    sentences = re.split(
+        r'(?<=[.!?])\s+',
+        text.strip()
+    )
+
+    sentences = [
+        s.strip() for s in sentences if s.strip()
+    ]
 
     if not sentences:
         return "Please enter your study notes first."
 
     if len(sentences) <= 3:
         return "### Summary\n\n" + "\n\n".join(
-            "• " + s.strip() for s in sentences if s.strip()
+            "• " + s for s in sentences
         )
 
-    words = re.findall(r'\b[a-zA-Z]{3,}\b', text.lower())
+    words = re.findall(
+        r'\b[a-zA-Z]{3,}\b',
+        text.lower()
+    )
+
     stop_words = {
-        "the", "and", "for", "are", "with", "that", "this",
-        "from", "have", "has", "was", "were", "into", "their",
-        "they", "them", "also", "which", "will", "can", "been",
-        "being", "about", "there", "these", "those", "than",
-        "then", "when", "where", "what", "how", "why", "your", "you"
+        "the", "and", "for", "are", "with", "that",
+        "this", "from", "have", "has", "was", "were",
+        "into", "their", "they", "them", "also",
+        "which", "will", "can", "been", "being",
+        "about", "there", "these", "those", "than",
+        "then", "when", "where", "what", "how",
+        "why", "your", "you"
     }
-    frequency = Counter(w for w in words if w not in stop_words)
+
+    frequency = Counter(
+        w for w in words if w not in stop_words
+    )
 
     scored = []
-    for index, sentence in enumerate(sentences):
-        sw = re.findall(r'\b[a-zA-Z]{3,}\b', sentence.lower())
-        score = sum(frequency.get(w, 0) for w in sw)
-        scored.append((score, index, sentence.strip()))
 
-    top = sorted(scored, reverse=True)[:5]
-    top = sorted(top, key=lambda x: x[1])
+    for index, sentence in enumerate(sentences):
+
+        sw = re.findall(
+            r'\b[a-zA-Z]{3,}\b',
+            sentence.lower()
+        )
+
+        score = sum(
+            frequency.get(w, 0) for w in sw
+        )
+
+        scored.append((score, index, sentence))
+
+    top = sorted(
+        scored,
+        reverse=True
+    )[:5]
+
+    top = sorted(
+        top,
+        key=lambda x: x[1]
+    )
 
     return "### Summary\n\n" + "\n\n".join(
-        "• " + sentence for _, _, sentence in top if sentence
+        "• " + sentence
+        for _, _, sentence in top
     )
 
 
+# -----------------------------------
+# LOCAL QUESTION GENERATOR
+# -----------------------------------
+
 def local_questions(text):
+
     import re
+
     sentences = [
-        s.strip() for s in re.split(r'(?<=[.!?])\s+', text.strip())
+        s.strip()
+        for s in re.split(
+            r'(?<=[.!?])\s+',
+            text.strip()
+        )
         if s.strip()
     ]
+
     if not sentences:
         return "Please enter your study notes first."
 
     result = "### Short-answer questions\n\n"
+
     for i, sentence in enumerate(sentences[:5], 1):
+
         words = sentence.split()
         topic = " ".join(words[:8]).rstrip(".,!?")
-        result += f"{i}. Explain the following concept: {topic}.\n\n"
+
+        result += (
+            f"{i}. Explain the following concept: "
+            f"{topic}.\n\n"
+        )
 
     result += "### Important questions\n\n"
+
     for i, sentence in enumerate(sentences[:5], 1):
-        result += f"{i}. What is the main idea explained in this statement?\n"
+
+        result += (
+            f"{i}. What is the main idea explained "
+            f"in this statement?\n"
+        )
+
         result += f"   {sentence}\n\n"
 
     return result
 
 
+# -----------------------------------
+# QUIZ GENERATOR FUNCTION
+# -----------------------------------
+
 def build_quiz_questions(text):
-    """Create a simple quiz from entered notes and keep answers server-side."""
+
     import re
+
     sentences = [
-        item.strip() for item in re.split(r'(?<=[.!?])\s+', text.strip())
+        item.strip()
+        for item in re.split(
+            r'(?<=[.!?])\s+',
+            text.strip()
+        )
         if len(item.strip()) >= 8
     ]
+
     if not sentences:
         return []
 
     questions = []
+
     distractors = [
         "This information is not discussed in the study notes.",
         "This statement is unrelated to the topic being studied.",
         "The notes do not support this statement."
     ]
+
     for index, sentence in enumerate(sentences[:10], 1):
+
         options = [sentence] + distractors[:]
-        # Shuffle the answer position so it is not always option A.
-        import random
         random.shuffle(options)
+
         answer_index = options.index(sentence)
+
         questions.append({
             "number": index,
             "question": "Which statement is supported by the study notes?",
             "options": options,
             "answer": answer_index
         })
+
     return questions
 
+
+# -----------------------------------
+# AI SUMMARIZER PAGE
+# -----------------------------------
 
 @app.route("/ai-summarizer", methods=["GET", "POST"])
 def ai_summarizer():
@@ -848,12 +1022,10 @@ def ai_summarizer():
     if request.method == "POST":
 
         entered_text = request.form.get(
-            "text",
-            ""
+            "text", ""
         ).strip()
 
         if not entered_text:
-
             summary = "Please enter your study notes first."
 
         else:
@@ -865,6 +1037,10 @@ def ai_summarizer():
         entered_text=entered_text
     )
 
+
+# -----------------------------------
+# QUESTION GENERATOR PAGE
+# -----------------------------------
 
 @app.route("/question-generator", methods=["GET", "POST"])
 def question_generator():
@@ -878,12 +1054,10 @@ def question_generator():
     if request.method == "POST":
 
         entered_text = request.form.get(
-            "text",
-            ""
+            "text", ""
         ).strip()
 
         if not entered_text:
-
             questions = "Please enter your study notes first."
 
         else:
@@ -896,8 +1070,13 @@ def question_generator():
     )
 
 
+# -----------------------------------
+# QUIZ GENERATOR PAGE
+# -----------------------------------
+
 @app.route("/quiz-generator", methods=["GET", "POST"])
 def quiz_generator():
+
     if "user_id" not in session:
         return redirect(url_for("login"))
 
@@ -906,10 +1085,15 @@ def quiz_generator():
     share_url = ""
 
     if request.method == "POST":
-        entered_text = request.form.get("text", "").strip()
+
+        entered_text = request.form.get(
+            "text", ""
+        ).strip()
 
         if not entered_text:
+
             error = "Please enter your study notes first."
+
             return render_template(
                 "quiz_generator.html",
                 quiz_questions=quiz_questions,
@@ -918,9 +1102,17 @@ def quiz_generator():
                 error=error
             )
 
-        quiz_questions = build_quiz_questions(entered_text)
+        quiz_questions = build_quiz_questions(
+            entered_text
+        )
+
         if not quiz_questions:
-            error = "Please enter a few complete sentences in your study notes."
+
+            error = (
+                "Please enter a few complete sentences "
+                "in your study notes."
+            )
+
             return render_template(
                 "quiz_generator.html",
                 quiz_questions=quiz_questions,
@@ -930,17 +1122,29 @@ def quiz_generator():
             )
 
         token = secrets.token_urlsafe(24)
+
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute(
-            "INSERT INTO shared_quizzes (token, quiz_json, created_by) VALUES (%s, %s, %s)",
-            (token, json.dumps(quiz_questions), session.get("user_name", "Student"))
-        )
+
+        cursor.execute("""
+            INSERT INTO shared_quizzes
+            (token, quiz_json, created_by)
+            VALUES (%s, %s, %s)
+        """, (
+            token,
+            json.dumps(quiz_questions),
+            session.get("user_name", "Student")
+        ))
+
         conn.commit()
         cursor.close()
         conn.close()
 
-        share_url = url_for("shared_quiz", token=token, _external=True)
+        share_url = url_for(
+            "shared_quiz",
+            token=token,
+            _external=True
+        )
 
     return render_template(
         "quiz_generator.html",
@@ -951,13 +1155,24 @@ def quiz_generator():
     )
 
 
+# -----------------------------------
+# PUBLIC SHARED QUIZ
+# -----------------------------------
+
 @app.route("/shared-quiz/<token>", methods=["GET", "POST"])
 def shared_quiz(token):
-    # This route is intentionally public: recipients do not need to log in.
+
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT quiz_json FROM shared_quizzes WHERE token = %s", (token,))
+
+    cursor.execute("""
+        SELECT quiz_json
+        FROM shared_quizzes
+        WHERE token = %s
+    """, (token,))
+
     row = cursor.fetchone()
+
     cursor.close()
     conn.close()
 
@@ -965,14 +1180,22 @@ def shared_quiz(token):
         abort(404)
 
     quiz_questions = json.loads(row[0])
+
     score = None
     total = len(quiz_questions)
 
     if request.method == "POST":
+
         score = 0
+
         for question in quiz_questions:
-            selected = request.form.get(f"q{question['number']}")
+
+            selected = request.form.get(
+                f"q{question['number']}"
+            )
+
             if selected is not None and selected.isdigit():
+
                 if int(selected) == int(question["answer"]):
                     score += 1
 
@@ -985,6 +1208,10 @@ def shared_quiz(token):
     )
 
 
+# -----------------------------------
+# LOGOUT
+# -----------------------------------
+
 @app.route("/logout")
 def logout():
 
@@ -993,5 +1220,14 @@ def logout():
     return redirect(url_for("home"))
 
 
+# -----------------------------------
+# RUN APPLICATION
+# -----------------------------------
+
 if __name__ == "__main__":
-    app.run(debug=True)
+
+    app.run(
+        host="127.0.0.1",
+        port=5000,
+        debug=True
+    )
