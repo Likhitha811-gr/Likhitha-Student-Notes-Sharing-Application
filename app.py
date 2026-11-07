@@ -1356,7 +1356,7 @@ def admin_delete_note(note_id):
 
     return redirect(url_for("admin_notes"))
             
-    @app.route("/admin/quizzes")
+@app.route("/admin/quizzes")
 def admin_quizzes():
 
     if "user_id" not in session:
