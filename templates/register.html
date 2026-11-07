@@ -1,7 +1,10 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Register - Student Notes Sharing</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | Student Notes Sharing Application</title>
 
     <style>
         * {
@@ -11,152 +14,154 @@
         body {
             margin: 0;
             min-height: 100vh;
-            font-family: Arial, sans-serif;
-
+            font-family: "Segoe UI", Arial, sans-serif;
             background:
-                linear-gradient(rgba(245, 239, 227, 0.78), rgba(245, 239, 227, 0.78)),
-                url("{{ url_for('static', filename='regi.jpeg') }}");
-
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-
+                linear-gradient(rgba(248,243,233,.72), rgba(248,243,233,.72)),
+                url("/static/study-bg.jpg") center/cover fixed no-repeat;
             display: flex;
             justify-content: center;
             align-items: center;
+            padding: 28px 18px;
+            color: #493322;
         }
 
-        .register-box {
-            width: 430px;
-            padding: 30px;
-
-            background: rgba(255, 255, 255, 0.88);
-
+        .register-card {
+            width: 100%;
+            max-width: 520px;
+            background: rgba(255, 251, 244, .97);
+            padding: 34px;
+            border: 1px solid #eadbc7;
             border-radius: 20px;
-
-            box-shadow:
-                0 8px 30px rgba(0, 0, 0, 0.18);
+            box-shadow: 0 14px 40px rgba(83, 57, 33, .13);
         }
 
-        h1 {
+        .brand {
             text-align: center;
-            color: #5d4037;
-            margin-bottom: 8px;
+            margin-bottom: 24px;
+        }
+
+        .brand-icon {
+            font-size: 40px;
+            margin-bottom: 7px;
+        }
+
+        .brand h1 {
+            margin: 0;
+            font-size: 25px;
+            color: #70472b;
+        }
+
+        .brand p {
+            margin: 7px 0 0;
+            font-size: 14px;
+            color: #8b7865;
+        }
+
+        h2 {
+            margin: 0 0 7px;
+            font-size: 23px;
         }
 
         .subtitle {
-            text-align: center;
-            color: #777;
-            margin-bottom: 25px;
+            margin: 0 0 22px;
+            font-size: 14px;
+            color: #887765;
         }
 
-        .row {
-            display: flex;
-            gap: 12px;
-        }
-
-        .row .input-group {
-            flex: 1;
-        }
-
-        .input-group {
-            margin-bottom: 15px;
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
         }
 
         label {
             display: block;
-            margin-bottom: 6px;
-            color: #5d4037;
-            font-weight: bold;
+            margin: 14px 0 7px;
+            font-size: 14px;
+            font-weight: 600;
         }
 
-        input[type="text"],
-        input[type="email"],
-        input[type="password"] {
+        input {
             width: 100%;
-            padding: 12px;
-
-            border: 1px solid #c8b8a5;
+            padding: 12px 13px;
+            border: 1px solid #dfcfbb;
             border-radius: 10px;
-
-            font-size: 15px;
+            background: #fffdf9;
+            color: #493322;
+            font-size: 14px;
             outline: none;
         }
 
         input:focus {
-            border-color: #795548;
+            border-color: #9b6b43;
+            box-shadow: 0 0 0 3px rgba(155, 107, 67, .12);
         }
 
         .terms {
-            margin-top: 5px;
-            padding: 12px;
-
-            background: rgba(245, 239, 227, 0.8);
-
-            border-radius: 10px;
-
-            font-size: 13px;
-            color: #555;
-        }
-
-        .terms label {
             display: flex;
-            gap: 8px;
             align-items: flex-start;
-            font-weight: normal;
-            color: #555;
+            gap: 9px;
+            margin-top: 18px;
+            color: #806e5b;
+            font-size: 13px;
+            line-height: 1.5;
         }
 
         .terms input {
+            width: auto;
             margin-top: 3px;
         }
 
-        .terms ul {
-            margin: 8px 0 0 25px;
-            padding: 0;
-        }
-
-        button {
+        .submit-btn {
             width: 100%;
-            margin-top: 20px;
-
-            padding: 13px;
-
+            margin-top: 22px;
+            padding: 14px;
             border: none;
             border-radius: 10px;
-
-            background: #795548;
+            background: #815333;
             color: white;
-
             font-size: 16px;
-            font-weight: bold;
-
+            font-weight: 600;
             cursor: pointer;
         }
 
-        button:hover {
-            background: #5d4037;
+        .submit-btn:hover {
+            background: #694126;
         }
 
-        .login-link {
+        .bottom-text {
+            margin: 21px 0 0;
             text-align: center;
-            margin-top: 18px;
+            font-size: 14px;
+            color: #806e5b;
         }
 
-        .login-link a {
-            color: #795548;
+        a {
+            color: #815333;
+            font-weight: 600;
             text-decoration: none;
-            font-weight: bold;
         }
 
-        @media (max-width: 500px) {
-            .register-box {
-                width: 92%;
-                padding: 25px;
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .message {
+            padding: 10px 12px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            background: #f5e5d8;
+            color: #78452e;
+            font-size: 14px;
+        }
+
+        @media (max-width: 480px) {
+            .register-card {
+                padding: 25px 20px;
             }
 
-            .row {
-                flex-direction: column;
+            .form-row {
+                grid-template-columns: 1fr;
                 gap: 0;
             }
         }
@@ -164,113 +169,81 @@
 </head>
 
 <body>
+    <main class="register-card">
+        <div class="brand">
+            <div class="brand-icon">📚</div>
+            <h1>Student Notes</h1>
+            <p>Sharing Application</p>
+        </div>
 
-<div class="register-box">
+        <h2>Create Your Account</h2>
+        <p class="subtitle">Join the student learning community.</p>
 
-    <h1>Create Account</h1>
+        {% with messages = get_flashed_messages() %}
+            {% for message in messages %}
+                <div class="message">{{ message }}</div>
+            {% endfor %}
+        {% endwith %}
 
-    <p class="subtitle">
-        Join Student Notes Sharing Application
-    </p>
+        <form action="{{ url_for('register') }}" method="POST">
+            <div class="form-row">
+                <div>
+                    <label for="first_name">First Name</label>
+                    <input type="text" id="first_name" name="first_name"
+                           placeholder="First name" autocomplete="given-name" required>
+                </div>
 
-    <form method="POST" action="{{ url_for('register') }}">
-
-        <div class="row">
-
-            <div class="input-group">
-                <label>First Name</label>
-                <input
-                    type="text"
-                    name="first_name"
-                    placeholder="Enter first name"
-                    required
-                >
+                <div>
+                    <label for="last_name">Last Name</label>
+                    <input type="text" id="last_name" name="last_name"
+                           placeholder="Last name" autocomplete="family-name" required>
+                </div>
             </div>
 
-            <div class="input-group">
-                <label>Last Name</label>
-                <input
-                    type="text"
-                    name="last_name"
-                    placeholder="Enter last name"
-                    required
-                >
-            </div>
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username"
+                   placeholder="Choose a username" autocomplete="username" required>
 
-        </div>
+            <label for="email">Email Address</label>
+            <input type="email" id="email" name="email"
+                   placeholder="Enter your email" autocomplete="email" required>
 
-        <div class="input-group">
-            <label>Username</label>
-            <input
-                type="text"
-                name="username"
-                placeholder="Enter username"
-                required
-            >
-        </div>
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password"
+                   placeholder="Create a password" autocomplete="new-password"
+                   minlength="12" required>
 
-        <div class="input-group">
-            <label>Email</label>
-            <input
-                type="email"
-                name="email"
-                placeholder="Enter email address"
-                required
-            >
-        </div>
+            <label for="confirm_password">Confirm Password</label>
+            <input type="password" id="confirm_password" name="confirm_password"
+                   placeholder="Re-enter your password"
+                   autocomplete="new-password" minlength="12" required>
 
-        <div class="input-group">
-            <label>Password</label>
-            <input
-                type="password"
-                name="password"
-                placeholder="Create password"
-                minlength="12"
-                required
-            >
-        </div>
-
-        <div class="input-group">
-            <label>Confirm Password</label>
-            <input
-                type="password"
-                name="confirm_password"
-                placeholder="Confirm password"
-                minlength="12"
-                required
-            >
-        </div>
-
-        <div class="terms">
-
-            <label>
-                <input type="checkbox" required>
-
-                <span>
-                    I agree to the terms and conditions.
-                </span>
+            <label class="terms">
+                <input type="checkbox" name="terms" required>
+                <span>I agree to use this application responsibly and share study materials respectfully.</span>
             </label>
 
-            <ul>
-                <li>Use this application for educational purposes.</li>
-                <li>Upload only useful and appropriate study materials.</li>
-                <li>Do not upload copyrighted or harmful content.</li>
-            </ul>
+            <button type="submit" class="submit-btn">Create Account</button>
+        </form>
 
-        </div>
+        <p class="bottom-text">
+            Already have an account?
+            <a href="{{ url_for('login') }}">Login here</a>
+        </p>
+    </main>
 
-        <button type="submit">
-            Register
-        </button>
+    <script>
+        const form = document.querySelector("form");
 
-    </form>
+        form.addEventListener("submit", function (event) {
+            const password = document.getElementById("password").value;
+            const confirmPassword = document.getElementById("confirm_password").value;
 
-    <div class="login-link">
-        Already have an account?
-        <a href="{{ url_for('login') }}">Login</a>
-    </div>
-
-</div>
-
+            if (password !== confirmPassword) {
+                event.preventDefault();
+                alert("Passwords do not match. Please try again.");
+            }
+        });
+    </script>
 </body>
-</html>
+
