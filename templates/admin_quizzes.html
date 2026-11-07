@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Manage Quizzes</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f5f3ff; padding: 30px; color: #29234b; }
+        h1 { color: #4b3290; }
+        table { width: 100%; border-collapse: collapse; background: white; margin-top: 20px; }
+        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
+        th { background: #6941c6; color: white; }
+        a { color: #4b3290; }
+        .back { display: inline-block; margin-top: 20px; padding: 10px 15px; background: #6941c6; color: white; text-decoration: none; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Manage Quizzes</h1>
+    <table>
+        <tr><th>ID</th><th>Created By</th><th>Created At</th><th>Questions</th><th>Quiz</th></tr>
+        {% for quiz in quizzes %}
+        <tr>
+            <td>{{ quiz.id }}</td><td>{{ quiz.created_by or 'Unknown' }}</td>
+            <td>{{ quiz.created_at }}</td><td>{{ quiz.question_count }}</td>
+            <td><a href="{{ url_for('shared_quiz', token=quiz.token) }}" target="_blank">Open Quiz</a></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5">No shared quizzes available.</td></tr>
+        {% endfor %}
+    </table>
+    <a class="back" href="{{ url_for('admin_dashboard') }}">Back to Dashboard</a>
+</body>
+</html>

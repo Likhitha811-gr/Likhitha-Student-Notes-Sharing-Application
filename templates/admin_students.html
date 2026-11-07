@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Manage Students</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f5f3ff; padding: 30px; color: #29234b; }
+        h1 { color: #4b3290; }
+        table { width: 100%; border-collapse: collapse; background: white; margin-top: 20px; }
+        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
+        th { background: #6941c6; color: white; }
+        a { display: inline-block; margin-top: 20px; padding: 10px 15px; background: #6941c6; color: white; text-decoration: none; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Manage Students</h1>
+    <table>
+        <tr><th>ID</th><th>Name</th><th>Email</th><th>Role</th></tr>
+        {% for student in students %}
+        <tr>
+            <td>{{ student.id }}</td><td>{{ student.name }}</td>
+            <td>{{ student.email }}</td><td>{{ student.role }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4">No students registered.</td></tr>
+        {% endfor %}
+    </table>
+    <a href="{{ url_for('admin_dashboard') }}">Back to Dashboard</a>
+</body>
+</html>
