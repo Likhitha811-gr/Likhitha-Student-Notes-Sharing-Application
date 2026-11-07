@@ -1,241 +1,127 @@
-
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Login | Student Notes Sharing Application</title>
+    <title>Login - Student Notes Sharing Application</title>
 
     <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        :root {
-            --cream: #f8f3e9;
-            --card: #fffdf8;
-            --brown: #815333;
-            --dark: #493322;
-            --muted: #887765;
-            --border: #e5d7c5;
-        }
-
         body {
+            font-family: Arial, sans-serif;
+            background: #f5eee5;
             margin: 0;
-            min-height: 100vh;
-            font-family: "Segoe UI", Arial, sans-serif;
-
-            background-color: var(--cream);
-            background-image:
-                linear-gradient(
-                    rgba(248, 243, 233, 0.70),
-                    rgba(248, 243, 233, 0.70)
-                ),
-                url("/static/study-bg.jpg");
-
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 24px;
-            color: var(--dark);
+            padding: 0;
         }
 
-        .login-card {
-            width: 100%;
-            max-width: 420px;
-            padding: 38px 34px;
-            background: rgba(255, 253, 248, 0.96);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            box-shadow: 0 15px 45px rgba(73, 51, 34, 0.14);
-        }
-
-        .brand {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .brand-icon {
-            width: 66px;
-            height: 66px;
-            margin: 0 auto 12px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border-radius: 18px;
-            background: #f0e3d1;
-            font-size: 34px;
-        }
-
-        .brand h1 {
-            margin: 0;
-            font-size: 25px;
-            color: #70472b;
-        }
-
-        .brand p {
-            margin: 7px 0 0;
-            color: var(--muted);
-            font-size: 14px;
+        .login-container {
+            width: 350px;
+            margin: 100px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
 
         h2 {
-            margin: 0 0 8px;
-            font-size: 24px;
-        }
-
-        .subtitle {
-            margin: 0 0 25px;
-            color: var(--muted);
-            font-size: 14px;
-            line-height: 1.6;
-        }
-
-        .message {
-            margin-bottom: 14px;
-            padding: 12px;
-            border-radius: 9px;
-            background: #f7e7d9;
-            color: #78452e;
-            font-size: 14px;
-            overflow-wrap: anywhere;
+            text-align: center;
+            color: #704b32;
+            margin-bottom: 25px;
         }
 
         label {
             display: block;
-            margin: 17px 0 8px;
-            font-size: 14px;
-            font-weight: 600;
+            margin-bottom: 8px;
+            color: #4b3829;
+            font-weight: bold;
         }
 
         input {
-            display: block;
             width: 100%;
-            padding: 13px 14px;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            background: #fffefa;
-            color: var(--dark);
-            font-size: 15px;
-            outline: none;
-            transition: border-color 0.2s, box-shadow 0.2s;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #d6c2ad;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 14px;
         }
 
         input:focus {
-            border-color: #a77b52;
-            box-shadow: 0 0 0 3px rgba(129, 83, 51, 0.12);
+            outline: none;
+            border-color: #9b7050;
         }
 
-        input::placeholder {
-            color: #aa9b8a;
-        }
-
-        .submit-btn {
-            display: block;
+        /* Password eye icon */
+        .password-wrapper {
+            position: relative;
             width: 100%;
-            margin-top: 25px;
-            padding: 14px;
+        }
+
+        .password-wrapper input {
+            padding-right: 45px;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 35%;
+            transform: translateY(-50%);
             border: none;
-            border-radius: 10px;
-            background: var(--brown);
-            color: white;
-            font-size: 16px;
-            font-weight: 600;
+            background: transparent;
             cursor: pointer;
-            transition: background 0.2s, transform 0.2s;
+            font-size: 19px;
+            padding: 0;
         }
 
-        .submit-btn:hover {
-            background: #694126;
-            transform: translateY(-1px);
+        button[type="submit"] {
+            width: 100%;
+            padding: 12px;
+            background: #8b6042;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
         }
 
-        .bottom-text {
-            margin: 23px 0 0;
+        button[type="submit"]:hover {
+            background: #704b32;
+        }
+
+        .register-link {
             text-align: center;
-            color: var(--muted);
-            font-size: 14px;
-            line-height: 1.7;
+            margin-top: 20px;
         }
 
-        a {
-            color: var(--brown);
-            font-weight: 600;
+        .register-link a {
+            color: #8b6042;
             text-decoration: none;
         }
 
-        a:hover {
+        .register-link a:hover {
             text-decoration: underline;
-        }
-
-        .footer {
-            margin-top: 26px;
-            padding-top: 17px;
-            border-top: 1px solid var(--border);
-            text-align: center;
-            color: #9b8977;
-            font-size: 12px;
-            line-height: 1.6;
-        }
-
-        @media (max-width: 480px) {
-            body {
-                padding: 16px;
-            }
-
-            .login-card {
-                padding: 30px 22px;
-            }
-
-            .brand h1 {
-                font-size: 22px;
-            }
         }
     </style>
 </head>
 
 <body>
 
-    <main class="login-card">
+    <div class="login-container">
 
-        <header class="brand">
-            <div class="brand-icon">📚</div>
-            <h1>Student Notes</h1>
-            <p>Sharing Application</p>
-        </header>
+        <h2>Student Login</h2>
 
-        <section>
-            <h2>Welcome Back!</h2>
-            <p class="subtitle">
-                Login to continue your learning journey
-                and access your study materials.
-            </p>
+        <form method="POST" action="/login">
 
-            {% with messages = get_flashed_messages() %}
-                {% for message in messages %}
-                    <div class="message">{{ message }}</div>
-                {% endfor %}
-            {% endwith %}
+            <label for="email">Email</label>
+            <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="Enter your email"
+                autocomplete="email"
+                required
+            >
 
-            <form action="{{ url_for('login') }}" method="POST">
+            <label for="password">Password</label>
 
-                <label for="email">Email Address</label>
-                <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    placeholder="Enter your registered email"
-                    autocomplete="email"
-                    required
-                >
-
-                <label for="password">Password</label>
+            <div class="password-wrapper">
                 <input
                     type="password"
                     id="password"
@@ -245,24 +131,42 @@
                     required
                 >
 
-                <button type="submit" class="submit-btn">
-                    Login to Account →
-                </button>
+                <button
+                    type="button"
+                    class="toggle-password"
+                    onclick="togglePassword()"
+                    id="eyeButton"
+                    aria-label="Show password"
+                >👁</button>
+            </div>
 
-            </form>
+            <button type="submit">Login</button>
 
-            <p class="bottom-text">
-                Don't have an account?
-                <a href="{{ url_for('register') }}">Create Account</a>
-            </p>
-        </section>
+        </form>
 
-        <footer class="footer">
-            Student Notes Sharing Application<br>
-            Learn together, grow together ♡
-        </footer>
+        <div class="register-link">
+            Don't have an account?
+            <a href="/register">Register</a>
+        </div>
 
-    </main>
+    </div>
+
+    <script>
+        function togglePassword() {
+            const password = document.getElementById("password");
+            const eyeButton = document.getElementById("eyeButton");
+
+            if (password.type === "password") {
+                password.type = "text";
+                eyeButton.innerHTML = "🙈";
+                eyeButton.setAttribute("aria-label", "Hide password");
+            } else {
+                password.type = "password";
+                eyeButton.innerHTML = "👁";
+                eyeButton.setAttribute("aria-label", "Show password");
+            }
+        }
+    </script>
 
 </body>
-
+</html>
