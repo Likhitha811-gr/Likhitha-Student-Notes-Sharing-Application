@@ -33,32 +33,23 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 def get_db_connection():
 
-    # Render / TiDB Cloud
     if os.environ.get("DB_HOST"):
-
         db_config = {
             "host": os.environ["DB_HOST"],
             "port": int(os.environ.get("DB_PORT", "4000")),
             "user": os.environ["DB_USER"],
             "password": os.environ["DB_PASSWORD"],
-            "database": os.environ.get(
-                "DB_NAME",
-                "student_notes_db"
-            )
+            "database": os.environ.get("DB_NAME", "student_notes_db")
         }
 
         ca_path = os.environ.get("DB_SSL_CA")
-
         if ca_path:
             db_config.update({
                 "ssl_ca": ca_path,
                 "ssl_verify_cert": True,
                 "ssl_verify_identity": True
             })
-
-    # Localhost / XAMPP
     else:
-
         db_config = {
             "host": "localhost",
             "port": 3306,
@@ -95,16 +86,12 @@ def setup_database():
     columns = [row[0] for row in cursor.fetchall()]
 
     if "description" not in columns:
-        cursor.execute("""
-            ALTER TABLE uploaded_notes
-            ADD COLUMN description TEXT
-        """)
+        cursor.execute("ALTER TABLE uploaded_notes ADD COLUMN description TEXT")
 
     if "uploaded_by" not in columns:
-        cursor.execute("""
-            ALTER TABLE uploaded_notes
-            ADD COLUMN uploaded_by VARCHAR(255)
-        """)
+        cursor.execute(
+            "ALTER TABLE uploaded_notes ADD COLUMN uploaded_by VARCHAR(255)"
+        )
 
     if "uploaded_date" not in columns:
         cursor.execute("""
@@ -156,36 +143,19 @@ def home():
 def register():
 
     if request.method == "POST":
-
-        first_name = request.form.get(
-            "first_name", ""
-        ).strip()
-
-        last_name = request.form.get(
-            "last_name", ""
-        ).strip()
-
-        username = request.form.get(
-            "username", ""
-        ).strip()
-
-        email = request.form.get(
-            "email", ""
-        ).strip()
-
+        first_name = request.form.get("first_name", "").strip()
+        last_name = request.form.get("last_name", "").strip()
+        username = request.form.get("username", "").strip()
+        email = request.form.get("email", "").strip()
         password = request.form.get("password", "")
-        confirm_password = request.form.get(
-            "confirm_password", ""
-        )
+        confirm_password = request.form.get("confirm_password", "")
 
         if password != confirm_password:
             return "Passwords do not match."
 
         name = first_name
-
         if last_name:
             name = first_name + " " + last_name
-
         if not name:
             name = username
 
@@ -196,7 +166,6 @@ def register():
         cursor = None
 
         try:
-
             conn = get_db_connection()
             cursor = conn.cursor()
 
@@ -204,35 +173,25 @@ def register():
                 "SELECT id FROM users WHERE email = %s",
                 (email,)
             )
-
             existing_user = cursor.fetchone()
 
             if existing_user:
                 return "Email already registered."
 
             cursor.execute("""
-                INSERT INTO users
-                (name, email, password, role)
+                INSERT INTO users (name, email, password, role)
                 VALUES (%s, %s, %s, %s)
-            """, (
-                name,
-                email,
-                password,
-                "student"
-            ))
+            """, (name, email, password, "student"))
 
             conn.commit()
-
             return render_template("success.html")
 
         except mysql.connector.Error as e:
             return "Database error: " + str(e)
 
         finally:
-
             if cursor:
                 cursor.close()
-
             if conn:
                 conn.close()
 
@@ -247,7 +206,6 @@ def register():
 def login():
 
     if request.method == "POST":
-
         email = request.form.get("email", "").strip()
         password = request.form.get("password", "")
 
@@ -258,7 +216,6 @@ def login():
         cursor = None
 
         try:
-
             conn = get_db_connection()
             cursor = conn.cursor(dictionary=True)
 
@@ -271,7 +228,6 @@ def login():
             user = cursor.fetchone()
 
             if user and str(user["password"]) == str(password):
-
                 session["user_id"] = user["id"]
                 session["user_name"] = user["name"]
                 session["user_email"] = user["email"]
@@ -288,10 +244,8 @@ def login():
             return "Database error: " + str(e)
 
         finally:
-
             if cursor:
                 cursor.close()
-
             if conn:
                 conn.close()
 
@@ -316,14 +270,9 @@ def dashboard():
         FROM uploaded_notes
         ORDER BY uploaded_date DESC
     """)
-
     notes = cursor.fetchall()
 
-    cursor.execute("""
-        SELECT COUNT(*) AS total
-        FROM uploaded_notes
-    """)
-
+    cursor.execute("SELECT COUNT(*) AS total FROM uploaded_notes")
     total_notes = cursor.fetchone()["total"]
 
     cursor.execute("""
@@ -331,7 +280,6 @@ def dashboard():
         FROM uploaded_notes
         WHERE uploaded_by = %s
     """, (session["user_name"],))
-
     my_uploads = cursor.fetchone()["total"]
 
     cursor.execute("""
@@ -339,12 +287,8 @@ def dashboard():
         FROM favourites
         WHERE user_id = %s
     """, (session["user_id"],))
-
     favourite_rows = cursor.fetchall()
-
-    favourite_ids = {
-        row["note_id"] for row in favourite_rows
-    }
+    favourite_ids = {row["note_id"] for row in favourite_rows}
 
     cursor.close()
     conn.close()
@@ -370,13 +314,9 @@ def upload():
         return redirect(url_for("login"))
 
     if request.method == "POST":
-
         title = request.form.get("title", "").strip()
         subject = request.form.get("subject", "").strip()
-        description = request.form.get(
-            "description", ""
-        ).strip()
-
+        description = request.form.get("description", "").strip()
         file = request.files.get("file")
 
         if not title or not subject:
@@ -386,38 +326,20 @@ def upload():
             return "Please select a file."
 
         filename = secure_filename(file.filename)
-
         if not filename:
             return "Invalid file name."
 
-        file.save(
-            os.path.join(
-                app.config["UPLOAD_FOLDER"],
-                filename
-            )
-        )
+        file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
 
         conn = get_db_connection()
         cursor = conn.cursor()
 
         cursor.execute("""
             INSERT INTO uploaded_notes
-            (
-                title,
-                subject,
-                filename,
-                description,
-                uploaded_by,
-                uploaded_date
-            )
-            VALUES
-            (%s, %s, %s, %s, %s, NOW())
+            (title, subject, filename, description, uploaded_by, uploaded_date)
+            VALUES (%s, %s, %s, %s, %s, NOW())
         """, (
-            title,
-            subject,
-            filename,
-            description,
-            session["user_name"]
+            title, subject, filename, description, session["user_name"]
         ))
 
         conn.commit()
@@ -439,10 +361,7 @@ def view(filename):
     if "user_id" not in session:
         return redirect(url_for("login"))
 
-    return send_from_directory(
-        app.config["UPLOAD_FOLDER"],
-        filename
-    )
+    return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
 
 
 # -----------------------------------
@@ -478,36 +397,21 @@ def favourite(note_id):
     cursor.execute("""
         SELECT id
         FROM favourites
-        WHERE user_id = %s
-        AND note_id = %s
-    """, (
-        session["user_id"],
-        note_id
-    ))
+        WHERE user_id = %s AND note_id = %s
+    """, (session["user_id"], note_id))
 
     existing = cursor.fetchone()
 
     if existing:
-
         cursor.execute("""
             DELETE FROM favourites
-            WHERE user_id = %s
-            AND note_id = %s
-        """, (
-            session["user_id"],
-            note_id
-        ))
-
+            WHERE user_id = %s AND note_id = %s
+        """, (session["user_id"], note_id))
     else:
-
         cursor.execute("""
-            INSERT INTO favourites
-            (user_id, note_id)
+            INSERT INTO favourites (user_id, note_id)
             VALUES (%s, %s)
-        """, (
-            session["user_id"],
-            note_id
-        ))
+        """, (session["user_id"], note_id))
 
     conn.commit()
     cursor.close()
@@ -529,12 +433,7 @@ def profile():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
-    cursor.execute("""
-        SELECT *
-        FROM users
-        WHERE id = %s
-    """, (session["user_id"],))
-
+    cursor.execute("SELECT * FROM users WHERE id = %s", (session["user_id"],))
     user = cursor.fetchone()
 
     cursor.execute("""
@@ -542,7 +441,6 @@ def profile():
         FROM uploaded_notes
         WHERE uploaded_by = %s
     """, (session["user_name"],))
-
     total_uploads = cursor.fetchone()["total"]
 
     cursor.execute("""
@@ -550,7 +448,6 @@ def profile():
         FROM favourites
         WHERE user_id = %s
     """, (session["user_id"],))
-
     total_favourites = cursor.fetchone()["total"]
 
     cursor.close()
@@ -575,7 +472,6 @@ def edit_profile():
         return redirect(url_for("login"))
 
     if request.method == "POST":
-
         name = request.form.get("name", "").strip()
         email = request.form.get("email", "").strip()
 
@@ -587,14 +483,9 @@ def edit_profile():
 
         cursor.execute("""
             UPDATE users
-            SET name = %s,
-                email = %s
+            SET name = %s, email = %s
             WHERE id = %s
-        """, (
-            name,
-            email,
-            session["user_id"]
-        ))
+        """, (name, email, session["user_id"]))
 
         conn.commit()
         cursor.close()
@@ -608,21 +499,13 @@ def edit_profile():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
-    cursor.execute("""
-        SELECT *
-        FROM users
-        WHERE id = %s
-    """, (session["user_id"],))
-
+    cursor.execute("SELECT * FROM users WHERE id = %s", (session["user_id"],))
     user = cursor.fetchone()
 
     cursor.close()
     conn.close()
 
-    return render_template(
-        "edit_profile.html",
-        user=user
-    )
+    return render_template("edit_profile.html", user=user)
 
 
 # -----------------------------------
@@ -636,63 +519,43 @@ def change_password():
         return redirect(url_for("login"))
 
     if request.method == "POST":
-
-        current_password = request.form.get(
-            "current_password", ""
-        )
-
-        new_password = request.form.get(
-            "new_password", ""
-        )
-
-        confirm_password = request.form.get(
-            "confirm_password", ""
-        )
+        current_password = request.form.get("current_password", "")
+        new_password = request.form.get("new_password", "")
+        confirm_password = request.form.get("confirm_password", "")
 
         if new_password != confirm_password:
             return "New passwords do not match."
 
         if len(new_password) < 12:
             return "Password must contain at least 12 characters."
-
         if not any(c.isupper() for c in new_password):
             return "Password must contain an uppercase letter."
-
         if not any(c.islower() for c in new_password):
             return "Password must contain a lowercase letter."
-
         if not any(c.isdigit() for c in new_password):
             return "Password must contain a number."
-
         if not any(not c.isalnum() for c in new_password):
             return "Password must contain a special character."
 
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
 
-        cursor.execute("""
-            SELECT password
-            FROM users
-            WHERE id = %s
-        """, (session["user_id"],))
-
+        cursor.execute(
+            "SELECT password FROM users WHERE id = %s",
+            (session["user_id"],)
+        )
         user = cursor.fetchone()
 
         if not user or str(user["password"]) != str(current_password):
-
             cursor.close()
             conn.close()
-
             return "Current password is incorrect."
 
         cursor.execute("""
             UPDATE users
             SET password = %s
             WHERE id = %s
-        """, (
-            new_password,
-            session["user_id"]
-        ))
+        """, (new_password, session["user_id"]))
 
         conn.commit()
         cursor.close()
@@ -719,50 +582,32 @@ def edit_note(note_id):
     cursor.execute("""
         SELECT *
         FROM uploaded_notes
-        WHERE id = %s
-        AND uploaded_by = %s
-    """, (
-        note_id,
-        session["user_name"]
-    ))
+        WHERE id = %s AND uploaded_by = %s
+    """, (note_id, session["user_name"]))
 
     note = cursor.fetchone()
 
     if not note:
-
         cursor.close()
         conn.close()
-
         return "You are not allowed to edit this note."
 
     if request.method == "POST":
-
         title = request.form.get("title", "").strip()
         subject = request.form.get("subject", "").strip()
-        description = request.form.get(
-            "description", ""
-        ).strip()
+        description = request.form.get("description", "").strip()
 
         if not title or not subject:
-
             cursor.close()
             conn.close()
-
             return "Title and subject are required."
 
         cursor.execute("""
             UPDATE uploaded_notes
-            SET title = %s,
-                subject = %s,
-                description = %s
-            WHERE id = %s
-            AND uploaded_by = %s
+            SET title = %s, subject = %s, description = %s
+            WHERE id = %s AND uploaded_by = %s
         """, (
-            title,
-            subject,
-            description,
-            note_id,
-            session["user_name"]
+            title, subject, description, note_id, session["user_name"]
         ))
 
         conn.commit()
@@ -774,10 +619,7 @@ def edit_note(note_id):
     cursor.close()
     conn.close()
 
-    return render_template(
-        "edit_note.html",
-        note=note
-    )
+    return render_template("edit_note.html", note=note)
 
 
 # -----------------------------------
@@ -796,43 +638,25 @@ def delete_note(note_id):
     cursor.execute("""
         SELECT *
         FROM uploaded_notes
-        WHERE id = %s
-        AND uploaded_by = %s
-    """, (
-        note_id,
-        session["user_name"]
-    ))
+        WHERE id = %s AND uploaded_by = %s
+    """, (note_id, session["user_name"]))
 
     note = cursor.fetchone()
 
     if not note:
-
         cursor.close()
         conn.close()
-
         return "You are not allowed to delete this note."
 
-    cursor.execute("""
-        DELETE FROM favourites
-        WHERE note_id = %s
-    """, (note_id,))
-
+    cursor.execute("DELETE FROM favourites WHERE note_id = %s", (note_id,))
     cursor.execute("""
         DELETE FROM uploaded_notes
-        WHERE id = %s
-        AND uploaded_by = %s
-    """, (
-        note_id,
-        session["user_name"]
-    ))
+        WHERE id = %s AND uploaded_by = %s
+    """, (note_id, session["user_name"]))
 
     conn.commit()
 
-    file_path = os.path.join(
-        app.config["UPLOAD_FOLDER"],
-        note["filename"]
-    )
-
+    file_path = os.path.join(app.config["UPLOAD_FOLDER"], note["filename"])
     if os.path.exists(file_path):
         os.remove(file_path)
 
@@ -851,70 +675,38 @@ def local_summarize(text):
     import re
     from collections import Counter
 
-    sentences = re.split(
-        r'(?<=[.!?])\s+',
-        text.strip()
-    )
-
-    sentences = [
-        s.strip() for s in sentences if s.strip()
-    ]
+    sentences = re.split(r'(?<=[.!?])\s+', text.strip())
+    sentences = [s.strip() for s in sentences if s.strip()]
 
     if not sentences:
         return "Please enter your study notes first."
 
     if len(sentences) <= 3:
-        return "### Summary\n\n" + "\n\n".join(
-            "• " + s for s in sentences
-        )
+        return "### Summary\n\n" + "\n\n".join("• " + s for s in sentences)
 
-    words = re.findall(
-        r'\b[a-zA-Z]{3,}\b',
-        text.lower()
-    )
+    words = re.findall(r'\b[a-zA-Z]{3,}\b', text.lower())
 
     stop_words = {
-        "the", "and", "for", "are", "with", "that",
-        "this", "from", "have", "has", "was", "were",
-        "into", "their", "they", "them", "also",
-        "which", "will", "can", "been", "being",
-        "about", "there", "these", "those", "than",
-        "then", "when", "where", "what", "how",
-        "why", "your", "you"
+        "the", "and", "for", "are", "with", "that", "this", "from",
+        "have", "has", "was", "were", "into", "their", "they", "them",
+        "also", "which", "will", "can", "been", "being", "about",
+        "there", "these", "those", "than", "then", "when", "where",
+        "what", "how", "why", "your", "you"
     }
 
-    frequency = Counter(
-        w for w in words if w not in stop_words
-    )
-
+    frequency = Counter(w for w in words if w not in stop_words)
     scored = []
 
     for index, sentence in enumerate(sentences):
-
-        sw = re.findall(
-            r'\b[a-zA-Z]{3,}\b',
-            sentence.lower()
-        )
-
-        score = sum(
-            frequency.get(w, 0) for w in sw
-        )
-
+        sw = re.findall(r'\b[a-zA-Z]{3,}\b', sentence.lower())
+        score = sum(frequency.get(w, 0) for w in sw)
         scored.append((score, index, sentence))
 
-    top = sorted(
-        scored,
-        reverse=True
-    )[:5]
-
-    top = sorted(
-        top,
-        key=lambda x: x[1]
-    )
+    top = sorted(scored, reverse=True)[:5]
+    top = sorted(top, key=lambda x: x[1])
 
     return "### Summary\n\n" + "\n\n".join(
-        "• " + sentence
-        for _, _, sentence in top
+        "• " + sentence for _, _, sentence in top
     )
 
 
@@ -928,10 +720,7 @@ def local_questions(text):
 
     sentences = [
         s.strip()
-        for s in re.split(
-            r'(?<=[.!?])\s+',
-            text.strip()
-        )
+        for s in re.split(r'(?<=[.!?])\s+', text.strip())
         if s.strip()
     ]
 
@@ -941,24 +730,19 @@ def local_questions(text):
     result = "### Short-answer questions\n\n"
 
     for i, sentence in enumerate(sentences[:5], 1):
-
         words = sentence.split()
         topic = " ".join(words[:8]).rstrip(".,!?")
-
         result += (
-            f"{i}. Explain the following concept: "
-            f"{topic}.\n\n"
+            f"{i}. Explain the following concept: {topic}.\n\n"
         )
 
     result += "### Important questions\n\n"
 
     for i, sentence in enumerate(sentences[:5], 1):
-
         result += (
             f"{i}. What is the main idea explained "
             f"in this statement?\n"
         )
-
         result += f"   {sentence}\n\n"
 
     return result
@@ -974,10 +758,7 @@ def build_quiz_questions(text):
 
     sentences = [
         item.strip()
-        for item in re.split(
-            r'(?<=[.!?])\s+',
-            text.strip()
-        )
+        for item in re.split(r'(?<=[.!?])\s+', text.strip())
         if len(item.strip()) >= 8
     ]
 
@@ -993,10 +774,8 @@ def build_quiz_questions(text):
     ]
 
     for index, sentence in enumerate(sentences[:10], 1):
-
         options = [sentence] + distractors[:]
         random.shuffle(options)
-
         answer_index = options.index(sentence)
 
         questions.append({
@@ -1023,14 +802,10 @@ def ai_summarizer():
     entered_text = ""
 
     if request.method == "POST":
-
-        entered_text = request.form.get(
-            "text", ""
-        ).strip()
+        entered_text = request.form.get("text", "").strip()
 
         if not entered_text:
             summary = "Please enter your study notes first."
-
         else:
             summary = local_summarize(entered_text)
 
@@ -1055,14 +830,10 @@ def question_generator():
     entered_text = ""
 
     if request.method == "POST":
-
-        entered_text = request.form.get(
-            "text", ""
-        ).strip()
+        entered_text = request.form.get("text", "").strip()
 
         if not entered_text:
             questions = "Please enter your study notes first."
-
         else:
             questions = local_questions(entered_text)
 
@@ -1088,15 +859,10 @@ def quiz_generator():
     share_url = ""
 
     if request.method == "POST":
-
-        entered_text = request.form.get(
-            "text", ""
-        ).strip()
+        entered_text = request.form.get("text", "").strip()
 
         if not entered_text:
-
             error = "Please enter your study notes first."
-
             return render_template(
                 "quiz_generator.html",
                 quiz_questions=quiz_questions,
@@ -1105,17 +871,13 @@ def quiz_generator():
                 error=error
             )
 
-        quiz_questions = build_quiz_questions(
-            entered_text
-        )
+        quiz_questions = build_quiz_questions(entered_text)
 
         if not quiz_questions:
-
             error = (
                 "Please enter a few complete sentences "
                 "in your study notes."
             )
-
             return render_template(
                 "quiz_generator.html",
                 quiz_questions=quiz_questions,
@@ -1130,8 +892,7 @@ def quiz_generator():
         cursor = conn.cursor()
 
         cursor.execute("""
-            INSERT INTO shared_quizzes
-            (token, quiz_json, created_by)
+            INSERT INTO shared_quizzes (token, quiz_json, created_by)
             VALUES (%s, %s, %s)
         """, (
             token,
@@ -1143,11 +904,7 @@ def quiz_generator():
         cursor.close()
         conn.close()
 
-        share_url = url_for(
-            "shared_quiz",
-            token=token,
-            _external=True
-        )
+        share_url = url_for("shared_quiz", token=token, _external=True)
 
     return render_template(
         "quiz_generator.html",
@@ -1175,7 +932,6 @@ def shared_quiz(token):
     """, (token,))
 
     row = cursor.fetchone()
-
     cursor.close()
     conn.close()
 
@@ -1183,22 +939,16 @@ def shared_quiz(token):
         abort(404)
 
     quiz_questions = json.loads(row[0])
-
     score = None
     total = len(quiz_questions)
 
     if request.method == "POST":
-
         score = 0
 
         for question in quiz_questions:
-
-            selected = request.form.get(
-                f"q{question['number']}"
-            )
+            selected = request.form.get(f"q{question['number']}")
 
             if selected is not None and selected.isdigit():
-
                 if int(selected) == int(question["answer"]):
                     score += 1
 
@@ -1209,8 +959,6 @@ def shared_quiz(token):
         total=total,
         submitted=(request.method == "POST")
     )
-
-
 
 
 # -----------------------------------
@@ -1237,7 +985,9 @@ def admin_dashboard():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
-    cursor.execute("SELECT COUNT(*) AS total FROM users WHERE role = 'student'")
+    cursor.execute(
+        "SELECT COUNT(*) AS total FROM users WHERE role = 'student'"
+    )
     total_students = cursor.fetchone()["total"]
 
     cursor.execute("SELECT COUNT(*) AS total FROM uploaded_notes")
@@ -1277,7 +1027,6 @@ def admin_students():
     """)
 
     students = cursor.fetchall()
-
     cursor.close()
     conn.close()
 
@@ -1304,10 +1053,14 @@ def admin_notes():
     """)
 
     notes = cursor.fetchall()
-
     cursor.close()
     conn.close()
-    # -----------------------------------
+
+    # IMPORTANT: This return was missing in the pasted file.
+    return render_template("admin_notes.html", notes=notes)
+
+
+# -----------------------------------
 # ADMIN DELETE NOTE
 # -----------------------------------
 
@@ -1327,7 +1080,6 @@ def admin_delete_note(note_id):
         "SELECT filename FROM uploaded_notes WHERE id = %s",
         (note_id,)
     )
-
     note = cursor.fetchone()
 
     if note:
@@ -1335,19 +1087,16 @@ def admin_delete_note(note_id):
             "DELETE FROM favourites WHERE note_id = %s",
             (note_id,)
         )
-
         cursor.execute(
             "DELETE FROM uploaded_notes WHERE id = %s",
             (note_id,)
         )
-
         conn.commit()
 
         filepath = os.path.join(
             app.config["UPLOAD_FOLDER"],
             note["filename"]
         )
-
         if os.path.exists(filepath):
             os.remove(filepath)
 
@@ -1355,7 +1104,8 @@ def admin_delete_note(note_id):
     conn.close()
 
     return redirect(url_for("admin_notes"))
-            
+
+
 @app.route("/admin/quizzes")
 def admin_quizzes():
 
@@ -1400,9 +1150,7 @@ def admin_quizzes():
 
 @app.route("/logout")
 def logout():
-
     session.clear()
-
     return redirect(url_for("home"))
 
 
@@ -1411,7 +1159,6 @@ def logout():
 # -----------------------------------
 
 if __name__ == "__main__":
-
     app.run(
         host="127.0.0.1",
         port=5000,
