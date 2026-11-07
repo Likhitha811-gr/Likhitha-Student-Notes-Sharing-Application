@@ -1309,6 +1309,41 @@ def admin_notes():
     conn.close()
 
     return render_template("admin_notes.html", notes=notes)
+    @app.route("/admin/delete-note/<int:note_id>", methods=["POST"])
+def admin_delete_note(note_id):
+    if "user_id" not in session or session.get("role") != "admin":
+        return redirect(url_for("login"))
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute(
+        "SELECT filename FROM uploaded_notes WHERE id = %s",
+        (note_id,)
+    )
+    note = cursor.fetchone()
+
+    if note:
+        cursor.execute(
+            "DELETE FROM favourites WHERE note_id = %s",
+            (note_id,)
+        )
+
+        cursor.execute(
+            "DELETE FROM uploaded_notes WHERE id = %s",
+            (note_id,)
+        )
+
+        conn.commit()
+
+        filepath = os.path.join(app.config["UPLOAD_FOLDER"], note["filename"])
+        if os.path.exists(filepath):
+            os.remove(filepath)
+
+    cursor.close()
+    conn.close()
+
+    return redirect(url_for("admin_notes"))
 
 
 @app.route("/admin/quizzes")
