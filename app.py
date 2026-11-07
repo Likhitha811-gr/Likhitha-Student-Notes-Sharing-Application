@@ -1307,12 +1307,18 @@ def admin_notes():
 
     cursor.close()
     conn.close()
+    # -----------------------------------
+# ADMIN DELETE NOTE
+# -----------------------------------
 
-    return render_template("admin_notes.html", notes=notes)
-    @app.route("/admin/delete-note/<int:note_id>", methods=["POST"])
+@app.route("/admin/delete-note/<int:note_id>", methods=["POST"])
 def admin_delete_note(note_id):
-    if "user_id" not in session or session.get("role") != "admin":
+
+    if "user_id" not in session:
         return redirect(url_for("login"))
+
+    if not admin_required():
+        return "Access Denied! Admin only.", 403
 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
@@ -1321,6 +1327,7 @@ def admin_delete_note(note_id):
         "SELECT filename FROM uploaded_notes WHERE id = %s",
         (note_id,)
     )
+
     note = cursor.fetchone()
 
     if note:
@@ -1336,7 +1343,11 @@ def admin_delete_note(note_id):
 
         conn.commit()
 
-        filepath = os.path.join(app.config["UPLOAD_FOLDER"], note["filename"])
+        filepath = os.path.join(
+            app.config["UPLOAD_FOLDER"],
+            note["filename"]
+        )
+
         if os.path.exists(filepath):
             os.remove(filepath)
 
@@ -1344,9 +1355,8 @@ def admin_delete_note(note_id):
     conn.close()
 
     return redirect(url_for("admin_notes"))
-
-
-@app.route("/admin/quizzes")
+            
+        @app.route("/admin/quizzes")
 def admin_quizzes():
 
     if "user_id" not in session:
