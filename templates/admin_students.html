@@ -1,29 +1,158 @@
+
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Manage Students</title>
+    <title>Manage Students - Admin</title>
+
     <style>
-        body { font-family: Arial, sans-serif; background: #f5f3ff; padding: 30px; color: #29234b; }
-        h1 { color: #4b3290; }
-        table { width: 100%; border-collapse: collapse; background: white; margin-top: 20px; }
-        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
-        th { background: #6941c6; color: white; }
-        a { display: inline-block; margin-top: 20px; padding: 10px 15px; background: #6941c6; color: white; text-decoration: none; border-radius: 5px; }
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f3ff;
+            margin: 0;
+            padding: 30px;
+            color: #29234b;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            color: #4b3290;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+        }
+
+        .back-btn {
+            display: inline-block;
+            background: #6941c6;
+            color: white;
+            padding: 11px 18px;
+            border-radius: 7px;
+            text-decoration: none;
+        }
+
+        .back-btn:hover {
+            background: #4b3290;
+        }
+
+        .table-container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px #00000012;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px;
+        }
+
+        th {
+            background: #6941c6;
+            color: white;
+            padding: 14px;
+            text-align: left;
+        }
+
+        td {
+            padding: 14px;
+            border-bottom: 1px solid #eee;
+        }
+
+        tr:hover {
+            background: #faf8ff;
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 30px;
+            color: #777;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 15px;
+            }
+
+            .table-container {
+                padding: 10px;
+            }
+        }
     </style>
 </head>
+
 <body>
-    <h1>Manage Students</h1>
-    <table>
-        <tr><th>ID</th><th>Name</th><th>Email</th><th>Role</th></tr>
-        {% for student in students %}
-        <tr>
-            <td>{{ student.id }}</td><td>{{ student.name }}</td>
-            <td>{{ student.email }}</td><td>{{ student.role }}</td>
-        </tr>
-        {% else %}
-        <tr><td colspan="4">No students registered.</td></tr>
-        {% endfor %}
-    </table>
-    <a href="{{ url_for('admin_dashboard') }}">Back to Dashboard</a>
+
+<div class="container">
+
+    <div class="top-bar">
+        <div>
+            <h1>Manage Students</h1>
+            <p class="subtitle">
+                View all registered students.
+            </p>
+        </div>
+
+        <a href="{{ url_for('admin_dashboard') }}"
+           class="back-btn">
+            Back to Dashboard
+        </a>
+    </div>
+
+    <div class="table-container">
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Student ID</th>
+                    <th>Student Name</th>
+                    <th>Email Address</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for student in students %}
+                <tr>
+                    <td>{{ student.id }}</td>
+                    <td>{{ student.name }}</td>
+                    <td>{{ student.email }}</td>
+                </tr>
+
+                {% else %}
+                <tr>
+                    <td colspan="3" class="empty-message">
+                        No students found.
+                    </td>
+                </tr>
+                {% endfor %}
+
+            </tbody>
+        </table>
+
+    </div>
+
+</div>
+
 </body>
 </html>
