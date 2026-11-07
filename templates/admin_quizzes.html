@@ -1,31 +1,160 @@
+
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Manage Quizzes</title>
+    <title>Manage Quizzes - Admin</title>
+
     <style>
-        body { font-family: Arial, sans-serif; background: #f5f3ff; padding: 30px; color: #29234b; }
-        h1 { color: #4b3290; }
-        table { width: 100%; border-collapse: collapse; background: white; margin-top: 20px; }
-        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
-        th { background: #6941c6; color: white; }
-        a { color: #4b3290; }
-        .back { display: inline-block; margin-top: 20px; padding: 10px 15px; background: #6941c6; color: white; text-decoration: none; border-radius: 5px; }
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f3ff;
+            margin: 0;
+            padding: 30px;
+            color: #29234b;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            color: #4b3290;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+        }
+
+        .back-btn {
+            display: inline-block;
+            background: #6941c6;
+            color: white;
+            padding: 11px 18px;
+            border-radius: 7px;
+            text-decoration: none;
+        }
+
+        .back-btn:hover {
+            background: #4b3290;
+        }
+
+        .table-container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px #00000012;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 650px;
+        }
+
+        th {
+            background: #6941c6;
+            color: white;
+            padding: 14px;
+            text-align: left;
+        }
+
+        td {
+            padding: 14px;
+            border-bottom: 1px solid #eee;
+        }
+
+        tr:hover {
+            background: #faf8ff;
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 30px;
+            color: #777;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 15px;
+            }
+
+            .table-container {
+                padding: 10px;
+            }
+        }
     </style>
 </head>
+
 <body>
-    <h1>Manage Quizzes</h1>
-    <table>
-        <tr><th>ID</th><th>Created By</th><th>Created At</th><th>Questions</th><th>Quiz</th></tr>
-        {% for quiz in quizzes %}
-        <tr>
-            <td>{{ quiz.id }}</td><td>{{ quiz.created_by or 'Unknown' }}</td>
-            <td>{{ quiz.created_at }}</td><td>{{ quiz.question_count }}</td>
-            <td><a href="{{ url_for('shared_quiz', token=quiz.token) }}" target="_blank">Open Quiz</a></td>
-        </tr>
-        {% else %}
-        <tr><td colspan="5">No shared quizzes available.</td></tr>
-        {% endfor %}
-    </table>
-    <a class="back" href="{{ url_for('admin_dashboard') }}">Back to Dashboard</a>
+
+<div class="container">
+
+    <div class="top-bar">
+        <div>
+            <h1>Manage Quizzes</h1>
+            <p class="subtitle">
+                View all quizzes shared by students.
+            </p>
+        </div>
+
+        <a href="{{ url_for('admin_dashboard') }}"
+           class="back-btn">
+            Back to Dashboard
+        </a>
+    </div>
+
+    <div class="table-container">
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Quiz ID</th>
+                    <th>Quiz Title</th>
+                    <th>Created By</th>
+                    <th>Total Questions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for quiz in quizzes %}
+                <tr>
+                    <td>{{ quiz.id }}</td>
+                    <td>{{ quiz.title }}</td>
+                    <td>{{ quiz.created_by }}</td>
+                    <td>{{ quiz.question_count }}</td>
+                </tr>
+
+                {% else %}
+                <tr>
+                    <td colspan="4" class="empty-message">
+                        No quizzes available.
+                    </td>
+                </tr>
+                {% endfor %}
+
+            </tbody>
+        </table>
+
+    </div>
+
+</div>
+
 </body>
 </html>
