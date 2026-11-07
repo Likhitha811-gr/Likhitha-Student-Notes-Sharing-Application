@@ -277,6 +277,9 @@ def login():
                 session["user_email"] = user["email"]
                 session["user_role"] = user["role"]
 
+                if str(user.get("role", "student")).lower() == "admin":
+                    return redirect(url_for("admin_dashboard"))
+
                 return redirect(url_for("dashboard"))
 
             return "Invalid email or password."
@@ -1206,6 +1209,144 @@ def shared_quiz(token):
         total=total,
         submitted=(request.method == "POST")
     )
+
+
+
+
+# -----------------------------------
+# ADMIN PANEL
+# -----------------------------------
+
+def admin_required():
+    """Return True only when the logged-in account has the admin role."""
+    return (
+        "user_id" in session
+        and str(session.get("user_role", "")).lower() == "admin"
+    )
+
+
+@app.route("/admin-dashboard")
+def admin_dashboard():
+
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    if not admin_required():
+        return "Access Denied! Admin only.", 403
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("SELECT COUNT(*) AS total FROM users WHERE role = 'student'")
+    total_students = cursor.fetchone()["total"]
+
+    cursor.execute("SELECT COUNT(*) AS total FROM uploaded_notes")
+    total_notes = cursor.fetchone()["total"]
+
+    cursor.execute("SELECT COUNT(*) AS total FROM shared_quizzes")
+    total_quizzes = cursor.fetchone()["total"]
+
+    cursor.close()
+    conn.close()
+
+    return render_template(
+        "admin_dashboard.html",
+        total_students=total_students,
+        total_notes=total_notes,
+        total_quizzes=total_quizzes
+    )
+
+
+@app.route("/admin/students")
+def admin_students():
+
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    if not admin_required():
+        return "Access Denied! Admin only.", 403
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT id, name, email, role
+        FROM users
+        WHERE role = 'student'
+        ORDER BY id DESC
+    """)
+
+    students = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return render_template("admin_students.html", students=students)
+
+
+@app.route("/admin/notes")
+def admin_notes():
+
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    if not admin_required():
+        return "Access Denied! Admin only.", 403
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT id, title, subject, filename, description,
+               uploaded_by, uploaded_date
+        FROM uploaded_notes
+        ORDER BY uploaded_date DESC
+    """)
+
+    notes = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return render_template("admin_notes.html", notes=notes)
+
+
+@app.route("/admin/quizzes")
+def admin_quizzes():
+
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    if not admin_required():
+        return "Access Denied! Admin only.", 403
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT id, token, quiz_json, created_by, created_at
+        FROM shared_quizzes
+        ORDER BY created_at DESC
+    """)
+
+    quizzes = cursor.fetchall()
+
+    for quiz in quizzes:
+        try:
+            quiz_data = quiz.get("quiz_json") or "[]"
+            if isinstance(quiz_data, bytes):
+                quiz_data = quiz_data.decode("utf-8")
+            parsed_quiz = json.loads(quiz_data)
+            quiz["question_count"] = (
+                len(parsed_quiz) if isinstance(parsed_quiz, list) else 0
+            )
+        except (TypeError, ValueError, json.JSONDecodeError):
+            quiz["question_count"] = 0
+
+    cursor.close()
+    conn.close()
+
+    return render_template("admin_quizzes.html", quizzes=quizzes)
 
 
 # -----------------------------------
