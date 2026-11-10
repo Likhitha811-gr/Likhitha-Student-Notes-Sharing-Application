@@ -1,0 +1,73 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Shared Quiz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5efe6;
+            padding: 30px;
+            color: #49372b;
+        }
+        .container {
+            max-width: 750px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+        }
+        .question {
+            background: #faf6f0;
+            padding: 18px;
+            margin: 18px 0;
+            border-radius: 8px;
+        }
+        button {
+            background: #795548;
+            color: white;
+            padding: 12px 22px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .result {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Shared Quiz</h1>
+    <p>Answer the following questions.</p>
+
+    <form method="POST">
+        {% for question in quiz_questions %}
+        <div class="question">
+            <h3>{{ question.number }}. {{ question.question }}</h3>
+
+            {% for option in question.options %}
+            <label>
+                <input type="radio"
+                       name="q{{ question.number }}"
+                       value="{{ loop.index0 }}">
+                {{ option }}
+            </label>
+            <br><br>
+            {% endfor %}
+        </div>
+        {% endfor %}
+
+        <button type="submit">Submit Quiz</button>
+    </form>
+
+    {% if submitted %}
+    <div class="result">
+        Your Score: {{ score }} / {{ total }}
+    </div>
+    {% endif %}
+</div>
+</body>
+</html>
