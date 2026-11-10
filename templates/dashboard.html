@@ -744,18 +744,20 @@ body {
                     <a class="action share-action"
                        target="_blank" rel="noopener"
                        href="https://wa.me/?text={{ ('Study Notes: ' ~ note.title ~ ' - ' ~ request.url_root.rstrip('/') ~ url_for('view', filename=note.filename))|urlencode }}">
-                        WhatsApp
+                       Share on WhatsApp
                     </a>
 
-                    {% if note.uploaded_by == user_name %}
-                    <form class="delete-form"
-                          method="POST"
-                          action="{{ url_for('delete_note', note_id=note.id) }}"
-                          onsubmit="return confirm('Are you sure you want to delete this note and its PDF? This cannot be undone.');">
-                        <button type="submit" class="action delete-action">
-                            Delete
-                        </button>
-                    </form>
+                    
+{% if note.uploaded_by|string|trim|lower == user_name|string|trim|lower %}
+<form class="delete-form"
+      method="POST"
+      action="{{ url_for('delete_note', note_id=note.id) }}"
+      onsubmit="return confirm('Are you sure you want to delete this note?');">
+
+    <button type="submit" class="action delete-action">
+        🗑 Delete
+    </button> 
+</form>
                     {% endif %}
                 </div>
             </article>
