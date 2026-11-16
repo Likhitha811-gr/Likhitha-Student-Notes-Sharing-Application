@@ -708,6 +708,8 @@ def local_summarize(text):
     return "### Summary\n\n" + "\n\n".join(
         "• " + sentence for _, _, sentence in top
     )
+
+
 # -----------------------------------
 # LOCAL QUESTION GENERATOR
 # -----------------------------------
@@ -751,27 +753,29 @@ def local_questions(text):
 # -----------------------------------
 
 def build_quiz_questions(text):
+
     import re
-    import random
 
     sentences = [
-        s.strip()
-        for s in re.split(r'(?<=[.!?])\s+', text.strip())
-        if len(s.strip().split()) >= 4
+        item.strip()
+        for item in re.split(r'(?<=[.!?])\s+', text.strip())
+        if len(item.strip().split()) >= 4
     ]
 
     if not sentences:
         return []
 
     questions = []
+    question_patterns = [
+        "Which statement about {topic} is correct?",
+        "What important point is mentioned about {topic}?",
+        "Which option describes {topic} according to the notes?",
+        "What information do the notes provide about {topic}?"
+    ]
 
     for index, sentence in enumerate(sentences[:10]):
-
-        # Identify the topic from the sentence
         match = re.match(
-            r'^(.{1,60}?)\s+(?:is defined as|means|refers to|'
-            r'is used|are used|consists of|includes|contains|'
-            r'was|were|is|are)\b',
+            r'^(.{1,60}?)\s+(?:is defined as|means|refers to|is used|are used|used for|used to|consists of|includes|contains|was|were|is|are)\b',
             sentence,
             re.IGNORECASE
         )
@@ -780,63 +784,48 @@ def build_quiz_questions(text):
             topic = match.group(1).strip(" ,:")
         else:
             words = sentence.split()
-            topic = " ".join(words[:3]).strip(" ,:.")
+            topic = " ".join(words[:3]).strip(" ,:.") or "this topic"
 
         lower_sentence = sentence.lower()
 
-        # Choose a question based on the information in the sentence
         if any(word in lower_sentence for word in
                ["is defined as", "means", "refers to"]):
             question_text = f"Which statement explains the meaning of {topic}?"
-
         elif any(word in lower_sentence for word in
                  ["is used", "are used", "used for", "used to"]):
             question_text = f"Which statement explains the use of {topic}?"
-
         elif any(word in lower_sentence for word in
                  ["consists of", "includes", "contains"]):
             question_text = f"Which statement describes what {topic} includes?"
-
         elif any(word in lower_sentence for word in
                  ["because", "due to", "reason"]):
             question_text = f"Which statement gives a reason related to {topic}?"
-
         elif any(word in lower_sentence for word in
                  ["such as", "for example", "example"]):
             question_text = f"Which statement gives an example related to {topic}?"
-
         else:
-            patterns = [
-                f"Which statement about {topic} is correct?",
-                f"What important point is mentioned about {topic}?",
-                f"Which option describes {topic} according to the notes?",
-                f"What information do the notes provide about {topic}?"
-            ]
-            question_text = patterns[index % len(patterns)]
+            question_text = question_patterns[index % len(question_patterns)].format(
+                topic=topic
+            )
 
-        # Use other sentences as incorrect options
         distractors = [
-            s for i, s in enumerate(sentences)
-            if i != index and s.lower() != sentence.lower()
+            other for i, other in enumerate(sentences)
+            if i != index and other.lower() != sentence.lower()
         ]
-
         random.shuffle(distractors)
 
         options = [sentence]
-
         for item in distractors:
             if item not in options:
                 options.append(item)
             if len(options) == 4:
                 break
 
-        # Fallback options for short paragraphs
         fallback_options = [
             "This information is not mentioned in the given notes.",
             "This statement is not supported by the study material.",
             "The given notes do not provide this information."
         ]
-
         for item in fallback_options:
             if len(options) == 4:
                 break
@@ -844,16 +833,16 @@ def build_quiz_questions(text):
                 options.append(item)
 
         random.shuffle(options)
-        answer_index = options.index(sentence)
-
         questions.append({
             "number": index + 1,
             "question": question_text,
             "options": options,
-            "answer": answer_index
+            "answer": options.index(sentence)
         })
 
     return questions
+
+
 # -----------------------------------
 # AI SUMMARIZER PAGE
 # -----------------------------------
@@ -1007,23 +996,33 @@ def shared_quiz(token):
     quiz_questions = json.loads(row[0])
     score = None
     total = len(quiz_questions)
+    submitted = request.method == "POST"
 
-    if request.method == "POST":
+    if submitted:
         score = 0
 
         for question in quiz_questions:
             selected = request.form.get(f"q{question['number']}")
+            selected_index = None
 
             if selected is not None and selected.isdigit():
-                if int(selected) == int(question["answer"]):
-                    score += 1
+                selected_index = int(selected)
+                if not 0 <= selected_index < len(question["options"]):
+                    selected_index = None
+
+            correct_index = int(question["answer"])
+            question["selected"] = selected_index
+            question["is_correct"] = selected_index == correct_index
+
+            if question["is_correct"]:
+                score += 1
 
     return render_template(
         "shared_quiz.html",
         quiz_questions=quiz_questions,
         score=score,
         total=total,
-        submitted=(request.method == "POST")
+        submitted=submitted
     )
 
 
