@@ -1,73 +1,55 @@
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Shared Quiz</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f5efe6;
-            padding: 30px;
-            color: #49372b;
-        }
-        .container {
-            max-width: 750px;
-            margin: auto;
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-        }
-        .question {
-            background: #faf6f0;
-            padding: 18px;
-            margin: 18px 0;
-            border-radius: 8px;
-        }
-        button {
-            background: #795548;
-            color: white;
-            padding: 12px 22px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-        .result {
-            font-size: 20px;
-            font-weight: bold;
-            margin-top: 20px;
-        }
-    </style>
-</head>
-<body>
-<div class="container">
-    <h1>Shared Quiz</h1>
-    <p>Answer the following questions.</p>
+@app.route("/shared-quiz/<token>", methods=["GET", "POST"])
+def shared_quiz(token):
 
-    <form method="POST">
-        {% for question in quiz_questions %}
-        <div class="question">
-            <h3>{{ question.number }}. {{ question.question }}</h3>
+    conn = get_db_connection()
+    cursor = conn.cursor()
 
-            {% for option in question.options %}
-            <label>
-                <input type="radio"
-                       name="q{{ question.number }}"
-                       value="{{ loop.index0 }}">
-                {{ option }}
-            </label>
-            <br><br>
-            {% endfor %}
-        </div>
-        {% endfor %}
+    cursor.execute("""
+        SELECT quiz_json
+        FROM shared_quizzes
+        WHERE token = %s
+    """, (token,))
 
-        <button type="submit">Submit Quiz</button>
-    </form>
+    row = cursor.fetchone()
+    cursor.close()
+    conn.close()
 
-    {% if submitted %}
-    <div class="result">
-        Your Score: {{ score }} / {{ total }}
-    </div>
-    {% endif %}
-</div>
-</body>
-</html>
+    if not row:
+        abort(404)
+
+    quiz_questions = json.loads(row[0])
+    score = None
+    total = len(quiz_questions)
+    submitted = request.method == "POST"
+
+    if submitted:
+        score = 0
+
+        for question in quiz_questions:
+            selected = request.form.get(
+                f"q{question['number']}"
+            )
+
+            selected_index = None
+
+            if selected is not None and selected.isdigit():
+                selected_index = int(selected)
+
+            correct_index = int(question["answer"])
+
+            question["selected"] = selected_index
+            question["is_correct"] = (
+                selected_index == correct_index
+            )
+
+            if question["is_correct"]:
+                score += 1
+
+    return render_template(
+        "shared_quiz.html",
+        quiz_questions=quiz_questions,
+        score=score,
+        total=total,
+        submitted=submitted
+    )
