@@ -708,8 +708,6 @@ def local_summarize(text):
     return "### Summary\n\n" + "\n\n".join(
         "• " + sentence for _, _, sentence in top
     )
-
-
 # -----------------------------------
 # LOCAL QUESTION GENERATOR
 # -----------------------------------
@@ -753,11 +751,9 @@ def local_questions(text):
 # -----------------------------------
 
 def build_quiz_questions(text):
-
     import re
     import random
 
-    # Split paragraph into meaningful sentences
     sentences = [
         s.strip()
         for s in re.split(r'(?<=[.!?])\s+', text.strip())
@@ -768,72 +764,77 @@ def build_quiz_questions(text):
         return []
 
     questions = []
-    used_questions = set()
-
-    # Different question patterns
-    question_patterns = [
-        "What is {topic}?",
-        "Which statement correctly describes {topic}?",
-        "What do the notes explain about {topic}?",
-        "Which point is mentioned about {topic}?",
-        "According to the notes, what is true about {topic}?",
-        "Which option best explains {topic}?",
-        "What information is given about {topic}?",
-        "Which statement matches the concept of {topic}?"
-    ]
 
     for index, sentence in enumerate(sentences[:10]):
 
-        # Find the main topic from the sentence
+        # Identify the topic from the sentence
         match = re.match(
-            r'^(.{1,60}?)\s+(?:is|are|was|were|means|refers to|is defined as)\s+(.+)$',
+            r'^(.{1,60}?)\s+(?:is defined as|means|refers to|'
+            r'is used|are used|consists of|includes|contains|'
+            r'was|were|is|are)\b',
             sentence,
             re.IGNORECASE
         )
 
         if match:
             topic = match.group(1).strip(" ,:")
-            answer = match.group(2).strip()
         else:
-            words = re.findall(r'\b[A-Za-z][A-Za-z0-9+#.-]*\b', sentence)
-            topic = " ".join(words[:2]) if words else "this topic"
-            answer = sentence
+            words = sentence.split()
+            topic = " ".join(words[:3]).strip(" ,:.")
 
-        # Select a different question pattern
-        pattern = question_patterns[index % len(question_patterns)]
-        question_text = pattern.format(topic=topic)
+        lower_sentence = sentence.lower()
 
-        # Avoid duplicate questions
-        if question_text.lower() in used_questions:
-            question_text = (
-                f"Which important information about {topic} "
-                f"is supported by the notes?"
-            )
+        # Choose a question based on the information in the sentence
+        if any(word in lower_sentence for word in
+               ["is defined as", "means", "refers to"]):
+            question_text = f"Which statement explains the meaning of {topic}?"
 
-        used_questions.add(question_text.lower())
+        elif any(word in lower_sentence for word in
+                 ["is used", "are used", "used for", "used to"]):
+            question_text = f"Which statement explains the use of {topic}?"
 
-        # Use other sentences as distractors
+        elif any(word in lower_sentence for word in
+                 ["consists of", "includes", "contains"]):
+            question_text = f"Which statement describes what {topic} includes?"
+
+        elif any(word in lower_sentence for word in
+                 ["because", "due to", "reason"]):
+            question_text = f"Which statement gives a reason related to {topic}?"
+
+        elif any(word in lower_sentence for word in
+                 ["such as", "for example", "example"]):
+            question_text = f"Which statement gives an example related to {topic}?"
+
+        else:
+            patterns = [
+                f"Which statement about {topic} is correct?",
+                f"What important point is mentioned about {topic}?",
+                f"Which option describes {topic} according to the notes?",
+                f"What information do the notes provide about {topic}?"
+            ]
+            question_text = patterns[index % len(patterns)]
+
+        # Use other sentences as incorrect options
         distractors = [
             s for i, s in enumerate(sentences)
-            if i != index and s != sentence
+            if i != index and s.lower() != sentence.lower()
         ]
 
         random.shuffle(distractors)
 
-        options = [answer]
+        options = [sentence]
 
         for item in distractors:
             if item not in options:
                 options.append(item)
-
             if len(options) == 4:
                 break
 
-        # Add fallback options if notes contain fewer sentences
+        # Fallback options for short paragraphs
         fallback_options = [
-            "This concept is not explained in the given notes.",
-            "This information is not mentioned in the paragraph.",
-            "This statement is not supported by the study material."
+            "This information is not mentioned in the given notes.",
+            "This statement is not supported by the study material.",
+            "The given notes do not provide this information."
         ]
 
         for item in fallback_options:
@@ -843,7 +844,7 @@ def build_quiz_questions(text):
                 options.append(item)
 
         random.shuffle(options)
-        answer_index = options.index(answer)
+        answer_index = options.index(sentence)
 
         questions.append({
             "number": index + 1,
