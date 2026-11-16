@@ -1,55 +1,184 @@
 
-@app.route("/shared-quiz/<token>", methods=["GET", "POST"])
-def shared_quiz(token):
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Shared Quiz</title>
 
-    conn = get_db_connection()
-    cursor = conn.cursor()
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5efe6;
+            padding: 30px;
+            color: #49372b;
+        }
 
-    cursor.execute("""
-        SELECT quiz_json
-        FROM shared_quizzes
-        WHERE token = %s
-    """, (token,))
+        .container {
+            max-width: 750px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+        }
 
-    row = cursor.fetchone()
-    cursor.close()
-    conn.close()
+        .question {
+            background: #faf6f0;
+            padding: 18px;
+            margin: 18px 0;
+            border-radius: 8px;
+        }
 
-    if not row:
-        abort(404)
+        .option {
+            display: block;
+            margin: 12px 0;
+            line-height: 1.5;
+        }
 
-    quiz_questions = json.loads(row[0])
-    score = None
-    total = len(quiz_questions)
-    submitted = request.method == "POST"
+        button {
+            background: #795548;
+            color: white;
+            padding: 12px 22px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
 
-    if submitted:
-        score = 0
+        button:hover {
+            background: #5d4037;
+        }
 
-        for question in quiz_questions:
-            selected = request.form.get(
-                f"q{question['number']}"
-            )
+        .result {
+            font-size: 22px;
+            font-weight: bold;
+            margin-top: 25px;
+            padding: 18px;
+            background: #f5efe6;
+            border-radius: 8px;
+            text-align: center;
+        }
 
-            selected_index = None
+        .correct {
+            color: green;
+            font-weight: bold;
+        }
 
-            if selected is not None and selected.isdigit():
-                selected_index = int(selected)
+        .wrong {
+            color: #c62828;
+            font-weight: bold;
+        }
 
-            correct_index = int(question["answer"])
+        .answer-review {
+            margin-top: 15px;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            line-height: 1.6;
+        }
 
-            question["selected"] = selected_index
-            question["is_correct"] = (
-                selected_index == correct_index
-            )
+        .submit-area {
+            text-align: center;
+            margin-top: 25px;
+        }
+    </style>
+</head>
 
-            if question["is_correct"]:
-                score += 1
+<body>
 
-    return render_template(
-        "shared_quiz.html",
-        quiz_questions=quiz_questions,
-        score=score,
-        total=total,
-        submitted=submitted
-    )
+<div class="container">
+
+    <h1>Shared Quiz</h1>
+    <p>Answer the following questions.</p>
+
+    <form method="POST">
+
+        {% for question in quiz_questions %}
+
+        <div class="question">
+
+            <h3>
+                {{ question.number }}. {{ question.question }}
+            </h3>
+
+            {% for option in question.options %}
+
+            <label class="option">
+
+                <input
+                    type="radio"
+                    name="q{{ question.number }}"
+                    value="{{ loop.index0 }}"
+                    {% if submitted and question.selected == loop.index0 %}
+                        checked
+                    {% endif %}
+                    {% if submitted %}
+                        disabled
+                    {% endif %}
+                >
+
+                {{ option }}
+
+            </label>
+
+            {% endfor %}
+
+            {% if submitted %}
+
+            <div class="answer-review">
+
+                {% if question.selected is none %}
+                    <p class="wrong">Not Answered</p>
+                {% elif question.is_correct %}
+                    <p class="correct">Correct Answer!</p>
+                {% else %}
+                    <p class="wrong">Wrong Answer</p>
+                {% endif %}
+
+                <p>
+                    <strong>Your Answer:</strong>
+                    {% if question.selected is not none
+                          and question.selected >= 0
+                          and question.selected < question.options|length %}
+                        {{ question.options[question.selected] }}
+                    {% else %}
+                        Not Answered
+                    {% endif %}
+                </p>
+
+                <p>
+                    <strong>Correct Answer:</strong>
+                    {{ question.options[question.answer] }}
+                </p>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+        {% endfor %}
+
+        {% if not submitted %}
+        <div class="submit-area">
+            <button type="submit">Submit Quiz</button>
+        </div>
+        {% endif %}
+
+    </form>
+
+    {% if submitted %}
+
+    <div class="result">
+        Your Score: {{ score }} / {{ total }}
+        <p>
+            {% if total > 0 %}
+                {{ ((score / total) * 100)|round|int }}% 
+            {% endif %}
+        </p>
+    </div>
+
+    {% endif %}
+
+</div>
+
+</body>
+</html>
