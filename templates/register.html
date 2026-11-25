@@ -1,4 +1,4 @@
-
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,86 +9,87 @@
     <style>
         * {
             box-sizing: border-box;
+            font-family: "Segoe UI", Arial, sans-serif;
         }
 
         body {
             margin: 0;
             min-height: 100vh;
-            font-family: "Segoe UI", Arial, sans-serif;
             background:
                 linear-gradient(rgba(248,243,233,.72), rgba(248,243,233,.72)),
                 url("/static/study-bg.jpg") center/cover fixed no-repeat;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 28px 18px;
+            padding: 12px;
             color: #493322;
         }
 
         .register-card {
             width: 100%;
-            max-width: 520px;
+            max-width: 440px;
             background: rgba(255, 251, 244, .97);
-            padding: 34px;
+            padding: 22px 28px;
             border: 1px solid #eadbc7;
-            border-radius: 20px;
+            border-radius: 18px;
             box-shadow: 0 14px 40px rgba(83, 57, 33, .13);
         }
 
         .brand {
             text-align: center;
-            margin-bottom: 24px;
+            margin-bottom: 15px;
         }
 
         .brand-icon {
-            font-size: 40px;
-            margin-bottom: 7px;
+            font-size: 30px;
+            margin-bottom: 3px;
         }
 
         .brand h1 {
             margin: 0;
-            font-size: 25px;
+            font-size: 22px;
             color: #70472b;
         }
 
         .brand p {
-            margin: 7px 0 0;
-            font-size: 14px;
+            margin: 4px 0 0;
+            font-size: 12px;
             color: #8b7865;
         }
 
         h2 {
-            margin: 0 0 7px;
-            font-size: 23px;
+            margin: 0 0 5px;
+            font-size: 21px;
         }
 
         .subtitle {
-            margin: 0 0 22px;
-            font-size: 14px;
+            margin: 0 0 12px;
+            font-size: 12px;
             color: #887765;
         }
 
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 14px;
+            gap: 12px;
         }
 
         label {
             display: block;
-            margin: 14px 0 7px;
-            font-size: 14px;
+            margin: 9px 0 5px;
+            font-size: 12px;
             font-weight: 600;
         }
 
         input {
             width: 100%;
-            padding: 12px 13px;
+            height: 38px;
+            padding: 8px 11px;
             border: 1px solid #dfcfbb;
-            border-radius: 10px;
+            border-radius: 8px;
             background: #fffdf9;
             color: #493322;
-            font-size: 14px;
+            font-size: 13px;
             outline: none;
         }
 
@@ -97,25 +98,24 @@
             box-shadow: 0 0 0 3px rgba(155, 107, 67, .12);
         }
 
-        /* Password eye icon */
         .password-wrapper {
             position: relative;
             width: 100%;
         }
 
         .password-wrapper input {
-            padding-right: 45px;
+            padding-right: 42px;
         }
 
         .toggle-password {
             position: absolute;
-            right: 13px;
+            right: 10px;
             top: 50%;
             transform: translateY(-50%);
             border: none;
             background: transparent;
             cursor: pointer;
-            font-size: 19px;
+            font-size: 17px;
             padding: 3px;
             color: #70472b;
         }
@@ -123,27 +123,29 @@
         .terms {
             display: flex;
             align-items: flex-start;
-            gap: 9px;
-            margin-top: 18px;
+            gap: 8px;
+            margin-top: 12px;
             color: #806e5b;
-            font-size: 13px;
-            line-height: 1.5;
+            font-size: 11px;
+            line-height: 1.4;
         }
 
         .terms input {
-            width: auto;
-            margin-top: 3px;
+            width: 14px;
+            height: 14px;
+            margin-top: 1px;
+            flex-shrink: 0;
         }
 
         .submit-btn {
             width: 100%;
-            margin-top: 22px;
-            padding: 14px;
+            margin-top: 15px;
+            padding: 11px;
             border: none;
-            border-radius: 10px;
+            border-radius: 9px;
             background: #815333;
             color: white;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
         }
@@ -153,9 +155,9 @@
         }
 
         .bottom-text {
-            margin: 21px 0 0;
+            margin: 14px 0 0;
             text-align: center;
-            font-size: 14px;
+            font-size: 12px;
             color: #806e5b;
         }
 
@@ -170,17 +172,17 @@
         }
 
         .message {
-            padding: 10px 12px;
-            margin-bottom: 12px;
+            padding: 8px 10px;
+            margin-bottom: 8px;
             border-radius: 8px;
             background: #f5e5d8;
             color: #78452e;
-            font-size: 14px;
+            font-size: 12px;
         }
 
         @media (max-width: 480px) {
             .register-card {
-                padding: 25px 20px;
+                padding: 22px 18px;
             }
 
             .form-row {
@@ -188,11 +190,48 @@
                 gap: 0;
             }
         }
+
+        @media (max-height: 650px) and (min-width: 481px) {
+            body {
+                align-items: flex-start;
+            }
+
+            .register-card {
+                margin: 5px auto;
+                padding-top: 14px;
+                padding-bottom: 14px;
+            }
+
+            .brand {
+                margin-bottom: 9px;
+            }
+
+            .brand-icon {
+                font-size: 25px;
+            }
+
+            label {
+                margin-top: 7px;
+            }
+
+            input {
+                height: 35px;
+            }
+
+            .terms {
+                margin-top: 8px;
+            }
+
+            .submit-btn {
+                margin-top: 10px;
+            }
+        }
     </style>
 </head>
 
 <body>
     <main class="register-card">
+
         <div class="brand">
             <div class="brand-icon">📚</div>
             <h1>Student Notes</h1>
@@ -209,6 +248,7 @@
         {% endwith %}
 
         <form action="{{ url_for('register') }}" method="POST">
+
             <div class="form-row">
                 <div>
                     <label for="first_name">First Name</label>
@@ -263,6 +303,7 @@
             Already have an account?
             <a href="{{ url_for('login') }}">Login here</a>
         </p>
+
     </main>
 
     <script>
@@ -292,5 +333,7 @@
             }
         });
     </script>
+
 </body>
 </html>
+```
