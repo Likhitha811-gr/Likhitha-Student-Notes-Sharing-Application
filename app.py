@@ -682,7 +682,7 @@ def local_summarize(text):
         return "Please enter your study notes first."
 
     if len(sentences) <= 3:
-        return "### Summary\n\n" + "\n\n".join("• " + s for s in sentences)
+        return "Summary\n\n" + "\n\n".join("• " + s for s in sentences)
 
     words = re.findall(r'\b[a-zA-Z]{3,}\b', text.lower())
 
@@ -705,7 +705,7 @@ def local_summarize(text):
     top = sorted(scored, reverse=True)[:5]
     top = sorted(top, key=lambda x: x[1])
 
-    return "### Summary\n\n" + "\n\n".join(
+    return "Summary\n\n" + "\n\n".join(
         "• " + sentence for _, _, sentence in top
     )
 
