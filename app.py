@@ -15,6 +15,8 @@ app = Flask(
     static_folder="templates/static",
     template_folder="templates"
 )
+UPLOAD_FOLDER = os.path.join(app.root_path, "uploads")
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 app.secret_key = os.environ.get(
     "SECRET_KEY",
