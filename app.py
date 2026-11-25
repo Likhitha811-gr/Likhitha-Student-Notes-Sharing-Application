@@ -727,7 +727,7 @@ def local_questions(text):
     if not sentences:
         return "Please enter your study notes first."
 
-    result = "### Short-answer questions\n\n"
+    result = " Important questions\n\n"
 
     for i, sentence in enumerate(sentences[:5], 1):
         words = sentence.split()
@@ -736,7 +736,7 @@ def local_questions(text):
             f"{i}. Explain the following concept: {topic}.\n\n"
         )
 
-    result += "### Important questions\n\n"
+    result += "Short Answers questions\n\n"
 
     for i, sentence in enumerate(sentences[:5], 1):
         result += (
