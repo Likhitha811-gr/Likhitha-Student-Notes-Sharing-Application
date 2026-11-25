@@ -755,93 +755,124 @@ def local_questions(text):
 def build_quiz_questions(text):
 
     import re
+    import random
 
     sentences = [
-        item.strip()
-        for item in re.split(r'(?<=[.!?])\s+', text.strip())
-        if len(item.strip().split()) >= 4
+        s.strip()
+        for s in re.split(r'(?<=[.!?])\s+', text.strip())
+        if len(s.strip().split()) >= 4
     ]
 
     if not sentences:
         return []
 
     questions = []
-    question_patterns = [
-        "Which statement about {topic} is correct?",
-        "What important point is mentioned about {topic}?",
-        "Which option describes {topic} according to the notes?",
-        "What information do the notes provide about {topic}?"
-    ]
 
     for index, sentence in enumerate(sentences[:10]):
+
+        lower = sentence.lower()
+
         match = re.match(
-            r'^(.{1,60}?)\s+(?:is defined as|means|refers to|is used|are used|used for|used to|consists of|includes|contains|was|were|is|are)\b',
+            r'^(.{1,60}?)\s+(?:is defined as|means|refers to|is used|are used|used for|used to|consists of|includes|contains|is|are)\b',
             sentence,
             re.IGNORECASE
         )
 
         if match:
-            topic = match.group(1).strip(" ,:")
+            topic = match.group(1).strip(" ,:.")
         else:
-            words = sentence.split()
-            topic = " ".join(words[:3]).strip(" ,:.") or "this topic"
+            topic = " ".join(sentence.split()[:3]).strip(" ,:.")
 
-        lower_sentence = sentence.lower()
+        # Different question types
 
-        if any(word in lower_sentence for word in
+        if any(x in lower for x in
                ["is defined as", "means", "refers to"]):
-            question_text = f"Which statement explains the meaning of {topic}?"
-        elif any(word in lower_sentence for word in
+
+            question_text = f"What is {topic}?"
+
+        elif any(x in lower for x in
                  ["is used", "are used", "used for", "used to"]):
-            question_text = f"Which statement explains the use of {topic}?"
-        elif any(word in lower_sentence for word in
+
+            question_text = f"What is {topic} used for?"
+
+        elif any(x in lower for x in
                  ["consists of", "includes", "contains"]):
-            question_text = f"Which statement describes what {topic} includes?"
-        elif any(word in lower_sentence for word in
+
+            question_text = f"What does {topic} include?"
+
+        elif any(x in lower for x in
                  ["because", "due to", "reason"]):
-            question_text = f"Which statement gives a reason related to {topic}?"
-        elif any(word in lower_sentence for word in
+
+            question_text = f"Why is {topic} important?"
+
+        elif any(x in lower for x in
                  ["such as", "for example", "example"]):
-            question_text = f"Which statement gives an example related to {topic}?"
+
+            question_text = f"Give an example of {topic}."
+
+        elif any(x in lower for x in
+                 ["purpose", "aim", "objective"]):
+
+            question_text = f"What is the purpose of {topic}?"
+
+        elif any(x in lower for x in
+                 ["process", "steps", "working", "works"]):
+
+            question_text = f"How does {topic} work?"
+
         else:
-            question_text = question_patterns[index % len(question_patterns)].format(
-                topic=topic
-            )
+
+            patterns = [
+                f"Explain {topic}.",
+                f"What is {topic}?",
+                f"How is {topic} described?",
+                f"What is the main function of {topic}?",
+                f"Why is {topic} important?"
+            ]
+
+            question_text = patterns[index % len(patterns)]
+
+        # Create answer options
 
         distractors = [
-            other for i, other in enumerate(sentences)
-            if i != index and other.lower() != sentence.lower()
+            other for other in sentences
+            if other != sentence
         ]
+
         random.shuffle(distractors)
 
         options = [sentence]
+
         for item in distractors:
             if item not in options:
                 options.append(item)
+
             if len(options) == 4:
                 break
 
         fallback_options = [
-            "This information is not mentioned in the given notes.",
-            "This statement is not supported by the study material.",
-            "The given notes do not provide this information."
+            "This information is not available in the notes.",
+            "This concept is not explained in the notes.",
+            "No related information is provided."
         ]
+
         for item in fallback_options:
             if len(options) == 4:
                 break
+
             if item not in options:
                 options.append(item)
 
         random.shuffle(options)
+
         questions.append({
-            "number": index + 1,
+            "number": len(questions) + 1,
             "question": question_text,
             "options": options,
             "answer": options.index(sentence)
         })
 
     return questions
-
 
 # -----------------------------------
 # AI SUMMARIZER PAGE
