@@ -1,10 +1,9 @@
-
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Student Notes - Login</title>
 
     <style>
@@ -21,80 +20,80 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 12px;
         }
 
         .login-card {
             width: 100%;
-            max-width: 455px;
+            max-width: 390px;
             background: #fffdf9;
-            border-radius: 25px;
-            padding: 40px 38px;
+            border-radius: 20px;
+            padding: 25px 30px;
             box-shadow: 0 10px 30px rgba(80, 50, 25, 0.15);
         }
 
         .logo {
-            width: 72px;
-            height: 72px;
+            width: 55px;
+            height: 55px;
             background: #f1e4d2;
-            border-radius: 20px;
-            margin: 0 auto 18px;
+            border-radius: 15px;
+            margin: 0 auto 10px;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 35px;
+            font-size: 28px;
         }
 
         .app-name {
             text-align: center;
             color: #4c2d1b;
-            font-size: 27px;
+            font-size: 23px;
             font-weight: bold;
         }
 
         .subtitle {
             text-align: center;
             color: #9a8d82;
-            margin-top: 8px;
-            font-size: 15px;
+            margin-top: 5px;
+            font-size: 13px;
         }
 
         .welcome {
             color: #3f2b1d;
-            font-size: 27px;
+            font-size: 23px;
             font-weight: bold;
-            margin-top: 42px;
-            margin-bottom: 12px;
+            margin-top: 22px;
+            margin-bottom: 8px;
         }
 
         .description {
             color: #958a80;
-            font-size: 15px;
-            line-height: 1.6;
-            margin-bottom: 28px;
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 17px;
         }
 
         label {
             display: block;
             color: #514238;
             font-weight: bold;
-            font-size: 14px;
-            margin-bottom: 8px;
+            font-size: 13px;
+            margin-bottom: 6px;
         }
 
         .input-box {
             position: relative;
-            margin-bottom: 23px;
+            margin-bottom: 15px;
         }
 
         input {
             width: 100%;
-            height: 50px;
+            height: 43px;
             border: 1px solid #ddd5cc;
-            border-radius: 10px;
+            border-radius: 9px;
             background: #eaf2ff;
-            padding: 0 15px;
-            font-size: 15px;
+            padding: 0 13px;
+            font-size: 14px;
             color: #40352e;
             outline: none;
         }
@@ -104,28 +103,28 @@
         }
 
         .password-input {
-            padding-right: 48px;
+            padding-right: 45px;
         }
 
         .eye {
             position: absolute;
-            right: 15px;
+            right: 13px;
             top: 50%;
             transform: translateY(-50%);
             cursor: pointer;
-            font-size: 20px;
+            font-size: 18px;
             color: #765d4a;
             user-select: none;
         }
 
         .login-btn {
             width: 100%;
-            height: 52px;
+            height: 45px;
             border: none;
-            border-radius: 10px;
+            border-radius: 9px;
             background: #8b5734;
             color: white;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: bold;
             cursor: pointer;
             margin-top: 2px;
@@ -137,9 +136,9 @@
 
         .create-account {
             text-align: center;
-            margin-top: 30px;
+            margin-top: 18px;
             color: #9a9088;
-            font-size: 14px;
+            font-size: 13px;
         }
 
         .create-account a {
@@ -151,24 +150,36 @@
         .line {
             height: 1px;
             background: #e5ddd4;
-            margin-top: 30px;
+            margin-top: 18px;
         }
 
         .footer {
             text-align: center;
             color: #aaa098;
-            font-size: 13px;
-            line-height: 1.7;
-            margin-top: 22px;
+            font-size: 11px;
+            line-height: 1.5;
+            margin-top: 13px;
         }
 
         @media (max-width: 500px) {
             .login-card {
-                padding: 32px 25px;
+                padding: 23px 20px;
+            }
+        }
+
+        @media (max-height: 600px) {
+            body {
+                align-items: flex-start;
+            }
+
+            .login-card {
+                margin: 5px auto;
+                padding-top: 15px;
+                padding-bottom: 15px;
             }
 
             .welcome {
-                font-size: 24px;
+                margin-top: 12px;
             }
         }
     </style>
@@ -189,8 +200,6 @@
             Login to continue your learning journey and access your
             study materials.
         </p>
-
-        <!-- CORRECTED LOGIN FORM -->
 
         <form action="{{ url_for('login') }}" method="POST">
 
@@ -221,9 +230,7 @@
 
                 <span class="eye"
                       onclick="togglePassword()"
-                      id="eye">
-                    👁
-                </span>
+                      id="eye">👁</span>
 
             </div>
 
@@ -249,7 +256,6 @@
 
     <script>
         function togglePassword() {
-
             const password = document.getElementById("password");
             const eye = document.getElementById("eye");
 
@@ -265,3 +271,4 @@
 
 </body>
 </html>
+```
