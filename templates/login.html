@@ -1,169 +1,256 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Login - Student Notes Sharing Application</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Student Notes - Login</title>
 
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f5eee5;
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
+            font-family: Arial, sans-serif;
         }
 
-        .login-container {
-            width: 350px;
-            margin: 100px auto;
-            padding: 30px;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        body {
+            background: #f5eee5;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
         }
 
-        h2 {
+        .login-card {
+            width: 100%;
+            max-width: 455px;
+            background: #fffdf9;
+            border-radius: 25px;
+            padding: 40px 38px;
+            box-shadow: 0 10px 30px rgba(80, 50, 25, 0.15);
+        }
+
+        .logo {
+            width: 72px;
+            height: 72px;
+            background: #f1e4d2;
+            border-radius: 20px;
+            margin: 0 auto 18px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 35px;
+        }
+
+        .app-name {
             text-align: center;
-            color: #704b32;
-            margin-bottom: 25px;
+            color: #4c2d1b;
+            font-size: 27px;
+            font-weight: bold;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #9a8d82;
+            margin-top: 8px;
+            font-size: 15px;
+        }
+
+        .welcome {
+            color: #3f2b1d;
+            font-size: 27px;
+            font-weight: bold;
+            margin-top: 42px;
+            margin-bottom: 12px;
+        }
+
+        .description {
+            color: #958a80;
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 28px;
         }
 
         label {
             display: block;
-            margin-bottom: 8px;
-            color: #4b3829;
+            color: #514238;
             font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .input-box {
+            position: relative;
+            margin-bottom: 23px;
         }
 
         input {
             width: 100%;
-            padding: 12px;
-            margin-bottom: 20px;
-            border: 1px solid #d6c2ad;
-            border-radius: 6px;
-            box-sizing: border-box;
-            font-size: 14px;
+            height: 50px;
+            border: 1px solid #ddd5cc;
+            border-radius: 10px;
+            background: #eaf2ff;
+            padding: 0 15px;
+            font-size: 15px;
+            color: #40352e;
+            outline: none;
         }
 
         input:focus {
-            outline: none;
-            border-color: #9b7050;
+            border-color: #8b5835;
         }
 
-        /* Password eye icon */
-        .password-wrapper {
-            position: relative;
-            width: 100%;
+        .password-input {
+            padding-right: 48px;
         }
 
-        .password-wrapper input {
-            padding-right: 45px;
-        }
-
-        .toggle-password {
+        .eye {
             position: absolute;
-            right: 12px;
-            top: 35%;
+            right: 15px;
+            top: 50%;
             transform: translateY(-50%);
-            border: none;
-            background: transparent;
             cursor: pointer;
-            font-size: 19px;
-            padding: 0;
+            font-size: 20px;
+            color: #765d4a;
+            user-select: none;
         }
 
-        button[type="submit"] {
+        .login-btn {
             width: 100%;
-            padding: 12px;
-            background: #8b6042;
-            color: white;
+            height: 52px;
             border: none;
-            border-radius: 6px;
-            cursor: pointer;
+            border-radius: 10px;
+            background: #8b5734;
+            color: white;
             font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 2px;
         }
 
-        button[type="submit"]:hover {
-            background: #704b32;
+        .login-btn:hover {
+            background: #75472a;
         }
 
-        .register-link {
+        .create-account {
             text-align: center;
-            margin-top: 20px;
+            margin-top: 30px;
+            color: #9a9088;
+            font-size: 14px;
         }
 
-        .register-link a {
-            color: #8b6042;
+        .create-account a {
+            color: #8b5734;
+            font-weight: bold;
             text-decoration: none;
         }
 
-        .register-link a:hover {
-            text-decoration: underline;
+        .line {
+            height: 1px;
+            background: #e5ddd4;
+            margin-top: 30px;
+        }
+
+        .footer {
+            text-align: center;
+            color: #aaa098;
+            font-size: 13px;
+            line-height: 1.7;
+            margin-top: 22px;
+        }
+
+        @media (max-width: 500px) {
+            .login-card {
+                padding: 32px 25px;
+            }
+
+            .welcome {
+                font-size: 24px;
+            }
         }
     </style>
 </head>
 
 <body>
 
-    <div class="login-container">
+    <div class="login-card">
 
-        <h2>Student Login</h2>
+        <div class="logo">📚</div>
 
-        <form method="POST" action="/login">
+        <div class="app-name">Student Notes</div>
+        <div class="subtitle">Sharing Application</div>
 
-            <label for="email">Email</label>
-            <input
-                type="email"
-                id="email"
-                name="email"
-                placeholder="Enter your email"
-                autocomplete="email"
-                required
-            >
+        <h1 class="welcome">Welcome Back!</h1>
+
+        <p class="description">
+            Login to continue your learning journey and access your
+            study materials.
+        </p>
+
+        <form>
+
+            <label for="email">Email Address</label>
+
+            <div class="input-box">
+                <input
+                    type="email"
+                    id="email"
+                    placeholder="Enter your email"
+                    required
+                >
+            </div>
 
             <label for="password">Password</label>
 
-            <div class="password-wrapper">
+            <div class="input-box">
                 <input
                     type="password"
                     id="password"
-                    name="password"
+                    class="password-input"
                     placeholder="Enter your password"
-                    autocomplete="current-password"
                     required
                 >
 
-                <button
-                    type="button"
-                    class="toggle-password"
-                    onclick="togglePassword()"
-                    id="eyeButton"
-                    aria-label="Show password"
-                >👁</button>
+                <span class="eye" onclick="togglePassword()" id="eye">
+                    👁
+                </span>
             </div>
 
-            <button type="submit">Login</button>
+            <button type="submit" class="login-btn">
+                Login to Account →
+            </button>
 
         </form>
 
-        <div class="register-link">
+        <div class="create-account">
             Don't have an account?
-            <a href="/register">Register</a>
+            <a href="#">Create Account</a>
+        </div>
+
+        <div class="line"></div>
+
+        <div class="footer">
+            Student Notes Sharing Application<br>
+            Learn together, grow together ♡
         </div>
 
     </div>
 
+
     <script>
         function togglePassword() {
+
             const password = document.getElementById("password");
-            const eyeButton = document.getElementById("eyeButton");
+            const eye = document.getElementById("eye");
 
             if (password.type === "password") {
                 password.type = "text";
-                eyeButton.innerHTML = "🙈";
-                eyeButton.setAttribute("aria-label", "Hide password");
+                eye.textContent = "🙈";
             } else {
                 password.type = "password";
-                eyeButton.innerHTML = "👁";
-                eyeButton.setAttribute("aria-label", "Show password");
+                eye.textContent = "👁";
             }
         }
     </script>
